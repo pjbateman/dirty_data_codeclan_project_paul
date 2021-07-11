@@ -1,0 +1,85 @@
+---
+title: "Decathlon Data"
+output: html_notebook
+---
+
+```{r}
+# loading in the libraries
+library(dplyr)
+library(here)
+```
+
+
+```{r}
+# loading in the data
+decathlon <- read_csv(here("clean_data/decathlon_clean.csv"))
+```
+Who had the longest long jump seen in the data?
+```{r}
+decathlon %>% 
+        slice_max(order_by = long_jump, n =1) %>% 
+        select(athlete, long_jump)
+   
+    
+    
+    
+  
+```
+
+
+What was the average 100m time in each competition?
+```{r}
+avg_dstar_100m <- decathlon %>% 
+  filter(!is.na(Decastar)) %>% 
+  summarise(
+    average_time = round(mean(x100m),2)
+  ) %>% 
+  pull()
+
+avg_og_100m <- decathlon %>% 
+  filter(!is.na(OlympicG)) %>% 
+  summarise(
+    average_time = round(mean(x100m),2)
+  ) %>% 
+  pull()
+
+paste("The average 100m time, in seconds, at the Decastar is",avg_dstar_100m,"and at the Olympic Games is ",avg_og_100m)
+```
+
+
+Who had the highest total points across both competitions?
+```{r}
+decathlon %>% 
+  group_by(athlete) %>% 
+  summarise(total_points = sum(points)) %>% 
+  arrange(desc(total_points)) %>% 
+  head(1)
+```
+
+
+What was the shot-put scores for the top three competitors in each competition?
+```{r}
+top3_shot_dstar <- decathlon %>% 
+  filter(!is.na(Decastar)) %>% 
+  arrange(desc(shot_put)) %>% 
+  select(athlete, shot_put) %>% 
+  head(3)
+top3_shot_dstar
+```
+```{r}
+top3_shot_og <- decathlon %>% 
+  filter(!is.na(OlympicG)) %>% 
+  arrange(desc(shot_put)) %>% 
+  select(athlete, shot_put) %>% 
+  head(3)
+top3_shot_og
+```
+
+
+
+What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?
+```{r}
+
+```
+
+
