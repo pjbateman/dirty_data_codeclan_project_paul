@@ -1,9 +1,8 @@
 # loading in the necessary libraries
-library(dplyr)
-library(tidyverse)
+
+library(tidyverse) # loads the tibble package to convert rownmes_to_col
 library(stringr) # to standardise the athlete names
 library(janitor) # to use the clean names function
-library(assertr)
 library(readr) # used to read in the raw data file type .rds
 
 # fetching the raw data file 
