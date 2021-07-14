@@ -184,13 +184,15 @@ candy_gender <- candy_countries %>%
 
 candy_age <- candy_gender %>% 
   mutate(
-    age = str_extract_all(string = age, pattern = "[0-9]+[.,][0-9]")
+    age = str_extract(string = age, pattern = "[0-9\\.,]+")
   ) %>% 
+  mutate(age = as.numeric(age)) %>% 
   arrange(age)
+ages <- distinct(candy_age, age)
 
 ages_before <- distinct(candy_gender,age) %>% 
   arrange(age)# 276 observations
-ages <- distinct(candy_age, age)
+
 # clean up the candy names
 # write the cleaned data to a new file
   # write_csv(test, "clean_data/candy_clean.csv")
