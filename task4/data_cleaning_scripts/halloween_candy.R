@@ -128,8 +128,8 @@ head(candy_data_types)
 uk <- c("england", "endland", "scotland", "uk", "united kindom") 
 usa <- c("'merica","ahem....amerca","alaska", "california", 
            "i pretend to be from canada, but i am really from the united states.",
-           "merica", "murica", "murrika", "n. america", 'new jersey',
-           "new york", "north corolina", "pittsburgh", "sub-canadian north america... 'merica",
+           "merica", "america", "murica", "murrika", "n. america", 'new jersey',
+           "new york", "north carolina", "pittsburgh", "sub-canadian north america... 'merica",
            "the best one - usa", "the united states", "the united states of america",
            "the yoo ess of aaayyyyyy", "trumpistan", "u s", "u s a",
            "u.s.", "u.s.a.", "united  states of america", "united states of america", "united sates",
@@ -144,7 +144,6 @@ usa <- c("'merica","ahem....amerca","alaska", "california",
 candy_countries <- candy_data_types %>% 
   mutate(
       country = str_trim(str_to_lower(country))) %>% 
-  arrange(country) %>% 
   mutate(country = 
         case_when(
           country %in% uk ~ "united kingdom",
@@ -159,13 +158,39 @@ candy_countries <- candy_data_types %>%
           country %in% c("españa") ~ "spain",
           country %in% c("the netherlands") ~ "netherlands",
           country %in% c("uae") ~ "united arab emirates",
+          str_detect(string = country, pattern = "[0-9]") ~ "unspecified",
           is.na(country) ~ "unspecified",
-          is.numeric(country) ~ "unspecified",
+          TRUE ~ country
                   )
-  ) %>% 
+        ) %>% 
+  arrange(country) %>% 
   mutate(country = str_to_title(country))
         
 countries <- distinct(candy_countries, country)
+
+
+# clean up the gender column data
+candy_gender <- candy_countries %>% 
+  mutate(
+    gender = fct_collapse(
+      gender, Unspecified = c("Other", "I'd rather not say"))) %>% 
+  mutate(
+    gender = fct_explicit_na(gender, "Unspecified")
+  )
+
+# clean up the age column data
+# want to keep values which contain begin two digits, followed by a blank, a 
+  # decimal place, or a comma., then extract the number, then convert to integer
+
+candy_age <- candy_gender %>% 
+  mutate(
+    age = str_extract_all(string = age, pattern = "[0-9]+[.,][0-9]")
+  ) %>% 
+  arrange(age)
+
+ages_before <- distinct(candy_gender,age) %>% 
+  arrange(age)# 276 observations
+ages <- distinct(candy_age, age)
 # clean up the candy names
 # write the cleaned data to a new file
   # write_csv(test, "clean_data/candy_clean.csv")
