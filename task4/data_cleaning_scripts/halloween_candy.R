@@ -125,18 +125,46 @@ candy_data_types <- candy_bound %>%
     #trick_or_treating = as.logical(trick_or_treating)) Need to look later
 
 head(candy_data_types)
+uk <- c("england", "endland", "scotland", "uk", "united kindom") 
+usa <- c("'merica","ahem....amerca","alaska", "california", 
+           "i pretend to be from canada, but i am really from the united states.",
+           "merica", "murica", "murrika", "n. america", 'new jersey',
+           "new york", "north corolina", "pittsburgh", "sub-canadian north america... 'merica",
+           "the best one - usa", "the united states", "the united states of america",
+           "the yoo ess of aaayyyyyy", "trumpistan", "u s", "u s a",
+           "u.s.", "u.s.a.", "united  states of america", "united states of america", "united sates",
+           "united staes", "united state", "united statea", "united stated",
+           "united statss", "united stetes", "unites states", "units states",
+           "us", "us of a", "usa", "usa (i think but it's an election year so who can really tell)",
+           "usa usa usa", "usa usa usa usa", "usa usa usa!!!!", "usa!", 
+           "usa! usa!", "usa! usa! usa!", "usa!!!!!!", "usa? hard to tell anymore..",
+           "usausausa", "ussa")
 
 # clean up the country column data
 candy_countries <- candy_data_types %>% 
-  usa <- c("'merica","ahem....amerca","	
-alaska")
-  uk <- c()
-    
   mutate(
       country = str_trim(str_to_lower(country))) %>% 
-    arrange(country)
-  # use a case when to set the country
-    
+  arrange(country) %>% 
+  mutate(country = 
+        case_when(
+          country %in% uk ~ "united kingdom",
+          country %in% usa ~ "united states",
+          country %in% c("can", "canada`", "canae") ~ "canada",
+          country %in% c("cascadia", "a tropical island south of the equator", 
+          "a", "atlantis", "denial", "earth", "eua", "europe", "fear and loathing", 
+          "god's country", "i don't know anymore", "insanity lately",
+          "narnia", "neverland", "not the usa or canada", "one of the best ones",
+          "see above", "somewhere", "subscribe to dm4uz3 on youtube",
+          "the republic of cascadia", "there isn't one for old men", "this one") ~ "unspecified",
+          country %in% c("españa") ~ "spain",
+          country %in% c("the netherlands") ~ "netherlands",
+          country %in% c("uae") ~ "united arab emirates",
+          is.na(country) ~ "unspecified",
+          is.numeric(country) ~ "unspecified",
+                  )
+  ) %>% 
+  mutate(country = str_to_title(country))
+        
 countries <- distinct(candy_countries, country)
 # clean up the candy names
 # write the cleaned data to a new file
