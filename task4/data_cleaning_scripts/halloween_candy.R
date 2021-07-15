@@ -179,7 +179,7 @@ candy_gender <- candy_countries %>%
   )
 
 # clean up the age column data
-# want to keep values which contain begin two digits, followed by a blank, a 
+# want to keep values which contain a number, possibly followed by a 
   # decimal place, or a comma., then extract the number, then convert to integer
 
 candy_age <- candy_gender %>% 
@@ -187,13 +187,16 @@ candy_age <- candy_gender %>%
     age = str_extract(string = age, pattern = "[0-9\\.,]+")
   ) %>% 
   mutate(age = as.numeric(age)) %>% 
+  filter(between(age,5,100)) %>% 
   arrange(age)
 ages <- distinct(candy_age, age)
 
 ages_before <- distinct(candy_gender,age) %>% 
   arrange(age)# 276 observations
 
-# clean up the candy names
+# clean up the candy names if enough time
+
 # write the cleaned data to a new file
-  # write_csv(test, "clean_data/candy_clean.csv")
+write_csv(candy_age, "clean_data/candy_clean.csv")
+
 # move to answering questions in an .Rmd file

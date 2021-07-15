@@ -215,21 +215,130 @@ pre code {
 
 
 <!-- rnb-text-begin -->
-<p>This is an <a href="http://rmarkdown.rstudio.com">R Markdown</a> Notebook. When you execute code within the notebook, the results appear beneath the code.</p>
-<p>Try executing this chunk by clicking the <em>Run</em> button within the chunk or by placing your cursor inside it and pressing <em>Cmd+Shift+Enter</em>.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGxvdChjYXJzKVxuYGBgIn0= -->
-<pre class="r"><code>plot(cars)</code></pre>
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsb2FkaW5nIGluIHRoZSBkYXRhLCBwcmVzZXJ2aW5nIHRoZSBjb2x1bW4gdHlwZXMgZnJvbWUgdGhlIGNsZWFuaW5nIHNjcmlwdFxuaGVyZTo6aGVyZSgpXG5cbmBgYCJ9 -->
+<pre class="r"><code># loading in the data, preserving the column types frome the cleaning script
+here::here()
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiL1VzZXJzL3VzZXIvRGVza3RvcC9Db2RlQ2xhbi9kaXJ0eV9kYXRhX2NvZGVjbGFuX3Byb2plY3RfcGF1bC90YXNrNFwiXG4ifQ== -->
+<pre><code>[1] &quot;/Users/user/Desktop/CodeClan/dirty_data_codeclan_project_paul/task4&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2FuZHlfY2xlYW4gPC0gcmVhZF9jc3YoaGVyZShcImNsZWFuX2RhdGEvY2FuZHlfY2xlYW4uY3N2XCIpLCBjb2xfdHlwZXMgPSBsaXN0KFxuICBjYW5keSA9IGNvbF9jaGFyYWN0ZXIoKSwgXG4gIHJhdGluZyA9IGNvbF9mYWN0b3IoKSwgXG4gIHllYXIgPSBjb2xfaW50ZWdlcigpLCBcbiAgY291bnRyeSA9IGNvbF9jaGFyYWN0ZXIoKSwgXG4gIGFnZSA9IGNvbF9kb3VibGUoKSwgXG4gIGdlbmRlciA9IGNvbF9mYWN0b3IoKSwgXG4gIGdlbmRlciA9IGNvbF9mYWN0b3IoKSwgXG4gIHRyaWNrX29yX3RyZWF0aW5nID0gY29sX2NoYXJhY3RlcigpXG4gICkpXG5gYGAifQ== -->
+<pre class="r"><code>candy_clean &lt;- read_csv(here(&quot;clean_data/candy_clean.csv&quot;), col_types = list(
+  candy = col_character(), 
+  rating = col_factor(), 
+  year = col_integer(), 
+  country = col_character(), 
+  age = col_double(), 
+  gender = col_factor(), 
+  gender = col_factor(), 
+  trick_or_treating = col_character()
+  ))</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Add a new chunk by clicking the <em>Insert Chunk</em> button on the toolbar or by pressing <em>Cmd+Option+I</em>.</p>
-<p>When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the <em>Preview</em> button or press <em>Cmd+Shift+K</em> to preview the HTML file).</p>
-<p>The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.</p>
+<ol style="list-style-type: decimal">
+<li>What is the total number of candy ratings given across the three years. (number of candy ratings, not number of raters. Don’t count missing values)</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFzdGUoXCJUaGUgdG90YWwgbnVtYmVyIG9mIGNhbmR5IHJhdGluZ3MgZ2l2ZW4gYWNyb3NzIHRoZSB0aHJlZSB5ZWFycyBpc1wiLGZvcm1hdEMocTFfbnVtYmVyX29mX3JhdGluZ3MsYmlnLm1hcmsgPSBcIixcIikpXG5cbmBgYCJ9 -->
+<pre class="r"><code>paste(&quot;The total number of candy ratings given across the three years is&quot;,formatC(q1_number_of_ratings,big.mark = &quot;,&quot;))
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIHRvdGFsIG51bWJlciBvZiBjYW5keSByYXRpbmdzIGdpdmVuIGFjcm9zcyB0aGUgdGhyZWUgeWVhcnMgaXMgNzQyLDc2NFwiXG4ifQ== -->
+<pre><code>[1] &quot;The total number of candy ratings given across the three years is 742,764&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="2" style="list-style-type: decimal">
+<li>What was the average age of people who are going out trick or treating?</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFzdGUoXCJUaGUgYXZlcmFnZSBhZ2Ugb2YgcGVvcGxlIHdobyBhcmUgZ29pbmcgb3V0IHRyaWNrIG9yIHRyZWF0aW5nIGlzXCIsIHJvdW5kKHEyX3RyaWNrX29yX3RyZWF0aW5nLCAwKSwgXCJ5ZWFycyBvbGQuXCIpXG5cbmBgYCJ9 -->
+<pre class="r"><code>paste(&quot;The average age of people who are going out trick or treating is&quot;, round(q2_trick_or_treating, 0), &quot;years old.&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZyBpcyAzNSB5ZWFycyBvbGQuXCJcbiJ9 -->
+<pre><code>[1] &quot;The average age of people who are going out trick or treating is 35 years old.&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="3" style="list-style-type: decimal">
+<li>What was the average age of people who are not going trick or treating?</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFzdGUoXCJUaGUgYXZlcmFnZSBhZ2Ugb2YgcGVvcGxlIHdobyBhcmUgbm90IGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZyBpc1wiLCByb3VuZChxM190cmlja19vcl90cmVhdGluZywgMCksIFwieWVhcnMgb2xkLlwiKVxuXG5gYGAifQ== -->
+<pre class="r"><code>paste(&quot;The average age of people who are not going out trick or treating is&quot;, round(q3_trick_or_treating, 0), &quot;years old.&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIG5vdCBnb2luZyBvdXQgdHJpY2sgb3IgdHJlYXRpbmcgaXMgMzkgeWVhcnMgb2xkLlwiXG4ifQ== -->
+<pre><code>[1] &quot;The average age of people who are not going out trick or treating is 39 years old.&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="4" style="list-style-type: decimal">
+<li>How many people rated Starburst as despair?</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFzdGUoZm9ybWF0QyhxNF9zdGFyYnVyc3RfYXNfZGVzcGFpcixiaWcubWFyayA9IFwiLFwiKSwgXCJwZW9wbGUgcmF0ZWQgU3RhcmJ1cnN0IGFzIGRlc3BhaXIuXCIpXG5cbmBgYCJ9 -->
+<pre class="r"><code>paste(formatC(q4_starburst_as_despair,big.mark = &quot;,&quot;), &quot;people rated Starburst as despair.&quot;)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiMSw4NzIgcGVvcGxlIHJhdGVkIFN0YXJidXJzdCBhcyBkZXNwYWlyLlwiXG4ifQ== -->
+<pre><code>[1] &quot;1,872 people rated Starburst as despair.&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>For the next three questions, count despair as -1, joy as +1 and meh as 0.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2xhc3MocTVfcmF0aW5nc19yZWNvZGVkJHJhdGluZylcblxuYGBgIn0= -->
+<pre class="r"><code>class(q5_ratings_recoded$rating)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiZmFjdG9yXCJcbiJ9 -->
+<pre><code>[1] &quot;factor&quot;</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="5" style="list-style-type: decimal">
+<li>What was the most popular candy bar by this rating system for each gender in the dataset?</li>
+</ol>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTVfYW5zd2VyIDwtIHE1X3JhdGluZ3NfcmVjb2RlZCAlPiUgXG4gIGdyb3VwX2J5KGNhbmR5KSAlPiUgXG4gIHN1bW1hcmlzZShwb3B1bGFyaXR5ID0gc3VtKHJhdGluZykpICU+JSBcbiAgc2xpY2VfbWF4KG4gPSAxKVxuXG5gYGAifQ== -->
+<pre class="r"><code>q5_answer &lt;- q5_ratings_recoded %&gt;% 
+  group_by(candy) %&gt;% 
+  summarise(popularity = sum(rating)) %&gt;% 
+  slice_max(n = 1)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IFByb2JsZW0gd2l0aCBgc3VtbWFyaXNlKClgIGNvbHVtbiBgcG9wdWxhcml0eWAuXG7ihLkgYHBvcHVsYXJpdHkgPSBzdW0ocmF0aW5nKWAuXG54IOKAmHN1beKAmSBub3QgbWVhbmluZ2Z1bCBmb3IgZmFjdG9yc1xu4oS5IFRoZSBlcnJvciBvY2N1cnJlZCBpbiBncm91cCAxOiBjYW5keSA9IFwiMTAwX2dyYW5kX2JhclwiLlxuUnVuIGBybGFuZzo6bGFzdF9lcnJvcigpYCB0byBzZWUgd2hlcmUgdGhlIGVycm9yIG9jY3VycmVkLlxuIn0= -->
+<pre><code>Error: Problem with `summarise()` column `popularity`.
+ℹ `popularity = sum(rating)`.
+x ‘sum’ not meaningful for factors
+ℹ The error occurred in group 1: candy = &quot;100_grand_bar&quot;.
+Run `rlang::last_error()` to see where the error occurred.</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<ol start="6" style="list-style-type: decimal">
+<li>What was the most popular candy bar in each year?</li>
+<li>What was the most popular candy bar by this rating for people in US, Canada, UK and all other countries?</li>
+</ol>
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiSGFsbG93ZWVuIENhbmR5IERhdGEiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KClRoaXMgaXMgYW4gW1IgTWFya2Rvd25dKGh0dHA6Ly9ybWFya2Rvd24ucnN0dWRpby5jb20pIE5vdGVib29rLiBXaGVuIHlvdSBleGVjdXRlIGNvZGUgd2l0aGluIHRoZSBub3RlYm9vaywgdGhlIHJlc3VsdHMgYXBwZWFyIGJlbmVhdGggdGhlIGNvZGUuIAoKVHJ5IGV4ZWN1dGluZyB0aGlzIGNodW5rIGJ5IGNsaWNraW5nIHRoZSAqUnVuKiBidXR0b24gd2l0aGluIHRoZSBjaHVuayBvciBieSBwbGFjaW5nIHlvdXIgY3Vyc29yIGluc2lkZSBpdCBhbmQgcHJlc3NpbmcgKkNtZCtTaGlmdCtFbnRlciouIAoKYGBge3J9CnBsb3QoY2FycykKYGBgCgpBZGQgYSBuZXcgY2h1bmsgYnkgY2xpY2tpbmcgdGhlICpJbnNlcnQgQ2h1bmsqIGJ1dHRvbiBvbiB0aGUgdG9vbGJhciBvciBieSBwcmVzc2luZyAqQ21kK09wdGlvbitJKi4KCldoZW4geW91IHNhdmUgdGhlIG5vdGVib29rLCBhbiBIVE1MIGZpbGUgY29udGFpbmluZyB0aGUgY29kZSBhbmQgb3V0cHV0IHdpbGwgYmUgc2F2ZWQgYWxvbmdzaWRlIGl0IChjbGljayB0aGUgKlByZXZpZXcqIGJ1dHRvbiBvciBwcmVzcyAqQ21kK1NoaWZ0K0sqIHRvIHByZXZpZXcgdGhlIEhUTUwgZmlsZSkuIAoKVGhlIHByZXZpZXcgc2hvd3MgeW91IGEgcmVuZGVyZWQgSFRNTCBjb3B5IG9mIHRoZSBjb250ZW50cyBvZiB0aGUgZWRpdG9yLiBDb25zZXF1ZW50bHksIHVubGlrZSAqS25pdCosICpQcmV2aWV3KiBkb2VzIG5vdCBydW4gYW55IFIgY29kZSBjaHVua3MuIEluc3RlYWQsIHRoZSBvdXRwdXQgb2YgdGhlIGNodW5rIHdoZW4gaXQgd2FzIGxhc3QgcnVuIGluIHRoZSBlZGl0b3IgaXMgZGlzcGxheWVkLgoK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiSGFsbG93ZWVuIENhbmR5IERhdGEiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCmBgYHtyfQojIGxvYWRpbmcgaW4gdGhlIGxpYnJhcmllcwpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShkcGx5cikKbGlicmFyeShoZXJlKQpsaWJyYXJ5KHN0cmluZ3IpCmBgYAoKCmBgYHtyfQojIGxvYWRpbmcgaW4gdGhlIGRhdGEsIHByZXNlcnZpbmcgdGhlIGNvbHVtbiB0eXBlcyBmcm9tZSB0aGUgY2xlYW5pbmcgc2NyaXB0CmhlcmU6OmhlcmUoKQpjYW5keV9jbGVhbiA8LSByZWFkX2NzdihoZXJlKCJjbGVhbl9kYXRhL2NhbmR5X2NsZWFuLmNzdiIpLCBjb2xfdHlwZXMgPSBsaXN0KAogIGNhbmR5ID0gY29sX2NoYXJhY3RlcigpLCAKICByYXRpbmcgPSBjb2xfZmFjdG9yKCksIAogIHllYXIgPSBjb2xfaW50ZWdlcigpLCAKICBjb3VudHJ5ID0gY29sX2NoYXJhY3RlcigpLCAKICBhZ2UgPSBjb2xfZG91YmxlKCksIAogIGdlbmRlciA9IGNvbF9mYWN0b3IoKSwgCiAgZ2VuZGVyID0gY29sX2ZhY3RvcigpLCAKICB0cmlja19vcl90cmVhdGluZyA9IGNvbF9jaGFyYWN0ZXIoKQogICkpCmBgYAoKMS4gIFdoYXQgaXMgdGhlIHRvdGFsIG51bWJlciBvZiBjYW5keSByYXRpbmdzIGdpdmVuIGFjcm9zcyB0aGUgdGhyZWUgeWVhcnMuIChudW1iZXIgb2YgY2FuZHkgcmF0aW5ncywgbm90IG51bWJlciBvZiByYXRlcnMuIERvbuKAmXQgY291bnQgbWlzc2luZyB2YWx1ZXMpCmBgYHtyfQpxMV9udW1iZXJfb2ZfcmF0aW5ncyA8LSBjYW5keV9jbGVhbiAlPiUgCiAgc2VsZWN0KHJhdGluZykgJT4lIAogIGZpbHRlcighaXMubmEocmF0aW5nKSkgJT4lIAogIHN1bW1hcmlzZShudW1fb2ZfY2FuZHlfcmF0aW5ncyA9IG4oKSkgJT4lIAogIHB1bGwoKQoKcGFzdGUoIlRoZSB0b3RhbCBudW1iZXIgb2YgY2FuZHkgcmF0aW5ncyBnaXZlbiBhY3Jvc3MgdGhlIHRocmVlIHllYXJzIGlzIixmb3JtYXRDKHExX251bWJlcl9vZl9yYXRpbmdzLGJpZy5tYXJrID0gIiwiKSkKIyBmaXJzdCBhbnN3ZXIgaXMgNzQyLDc2NApgYGAKCgoyLiAgV2hhdCB3YXMgdGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZz8KYGBge3J9CnEyX3RyaWNrX29yX3RyZWF0aW5nIDwtIGNhbmR5X2NsZWFuICU+JSAKICBzZWxlY3QoYWdlLCB0cmlja19vcl90cmVhdGluZykgJT4lIAogIGZpbHRlcigKICAgICFpcy5uYSh0cmlja19vcl90cmVhdGluZyksCiAgICB0cmlja19vcl90cmVhdGluZyA9PSAiWWVzIgogICAgKSAlPiUgCiAgc3VtbWFyaXNlKGF2ZXJhZ2VfYWdlID0gbWVhbihhZ2UsIG5hLnJhbSA9IFRSVUUpKSAlPiUgCiAgcHVsbCgpCgpwYXN0ZSgiVGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZyBpcyIsIHJvdW5kKHEyX3RyaWNrX29yX3RyZWF0aW5nLCAwKSwgInllYXJzIG9sZC4iKQojIGZpcnN0IGFuc3dlciBpcyAzNSB5ZWFycyBvbGQKYGBgCgoKMy4gIFdoYXQgd2FzIHRoZSBhdmVyYWdlIGFnZSBvZiBwZW9wbGUgd2hvIGFyZSBub3QgZ29pbmcgdHJpY2sgb3IgdHJlYXRpbmc/CmBgYHtyfQpxM190cmlja19vcl90cmVhdGluZyA8LSBjYW5keV9jbGVhbiAlPiUgCiAgc2VsZWN0KGFnZSwgdHJpY2tfb3JfdHJlYXRpbmcpICU+JSAKICBmaWx0ZXIoCiAgICAhaXMubmEodHJpY2tfb3JfdHJlYXRpbmcpLAogICAgdHJpY2tfb3JfdHJlYXRpbmcgPT0gIk5vIgogICAgKSAlPiUgCiAgc3VtbWFyaXNlKGF2ZXJhZ2VfYWdlID0gbWVhbihhZ2UsIG5hLnJhbSA9IFRSVUUpKSAlPiUgCiAgcHVsbCgpCgpwYXN0ZSgiVGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIG5vdCBnb2luZyBvdXQgdHJpY2sgb3IgdHJlYXRpbmcgaXMiLCByb3VuZChxM190cmlja19vcl90cmVhdGluZywgMCksICJ5ZWFycyBvbGQuIikKIyBmaXJzdCBhbnN3ZXIgaXMgMzkgeWVhcnMgb2xkCmBgYAoKNC4gSG93IG1hbnkgcGVvcGxlIHJhdGVkIFN0YXJidXJzdCBhcyBkZXNwYWlyPwpgYGB7cn0KcTRfc3RhcmJ1cnN0X2FzX2Rlc3BhaXIgPC0gY2FuZHlfY2xlYW4gJT4lIAogIHNlbGVjdChjYW5keSwgcmF0aW5nKSAlPiUgCiAgZmlsdGVyKAogICAgIWlzLm5hKHJhdGluZyksCiAgICBjYW5keSA9PSAic3RhcmJ1cnN0IiwKICAgIHJhdGluZyA9PSAiREVTUEFJUiIKICAgICkgJT4lIAogIHN1bW1hcmlzZShjb3VudCA9IG4oKSkgJT4lIAogIHB1bGwoKQoKcGFzdGUoZm9ybWF0QyhxNF9zdGFyYnVyc3RfYXNfZGVzcGFpcixiaWcubWFyayA9ICIsIiksICJwZW9wbGUgcmF0ZWQgU3RhcmJ1cnN0IGFzIGRlc3BhaXIuIikKIyBmaXJzdCBhbnN3ZXIgaXMgMSw4NzIgcGVvcGxlCmBgYAoKRm9yIHRoZSBuZXh0IHRocmVlIHF1ZXN0aW9ucywgY291bnQgZGVzcGFpciBhcyAtMSwgam95IGFzICsxIGFuZCBtZWggYXMgMC4KYGBge3J9CmdsaW1wc2UoY2FuZHlfY2xlYW4pCnE1X3JhdGluZ3NfcmVjb2RlZCA8LSBjYW5keV9jbGVhbiAlPiUgCiAgbXV0YXRlKAogICAgcmF0aW5nID0gcmVjb2RlX2ZhY3RvcihyYXRpbmcsIEpPWSA9IDEsIE1FSCA9IDAsIERFU1BBSVIgPSAtMSksCiAgICBhcy5udW1lcmljKHJhdGluZykKICApICU+JSAKICAgZmlsdGVyKAogICAgIWlzLm5hKHJhdGluZykpCmNsYXNzKHE1X3JhdGluZ3NfcmVjb2RlZCRyYXRpbmcpCmBgYAoKCjUuIFdoYXQgd2FzIHRoZSBtb3N0IHBvcHVsYXIgY2FuZHkgYmFyIGJ5IHRoaXMgcmF0aW5nIHN5c3RlbSBmb3IgZWFjaCBnZW5kZXIgaW4gdGhlIGRhdGFzZXQ/CmBgYHtyfQpxNV9hbnN3ZXIgPC0gcTVfcmF0aW5nc19yZWNvZGVkICU+JSAKICBzZWxlY3QoY2FuZHksIHJhdGluZywgZ2VuZGVyKSAlPiUgCiAgZmlsdGVyKGdlbmRlciA9PSAiTWFsZSIpICU+JSAKICBncm91cF9ieShjYW5keSkgJT4lIAogIHN1bW1hcmlzZShwb3B1bGFyaXR5ID0gc3VtKHJhdGluZykpICU+JSAKICBzbGljZV9tYXgobiA9IDEpCmBgYAoKCjYuIFdoYXQgd2FzIHRoZSBtb3N0IHBvcHVsYXIgY2FuZHkgYmFyIGluIGVhY2ggeWVhcj8KNy4gV2hhdCB3YXMgdGhlIG1vc3QgcG9wdWxhciBjYW5keSBiYXIgYnkgdGhpcyByYXRpbmcgZm9yIHBlb3BsZSBpbiBVUywgQ2FuYWRhLCBVSyBhbmQgYWxsIG90aGVyIGNvdW50cmllcz8K</div>
 
 
 

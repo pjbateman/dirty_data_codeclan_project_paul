@@ -3,17 +3,114 @@ title: "Halloween Candy Data"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
 ```{r}
-plot(cars)
+# loading in the libraries
+library(tidyverse)
+library(dplyr)
+library(here)
+library(stringr)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+```{r}
+# loading in the data, preserving the column types frome the cleaning script
+here::here()
+candy_clean <- read_csv(here("clean_data/candy_clean.csv"), col_types = list(
+  candy = col_character(), 
+  rating = col_factor(), 
+  year = col_integer(), 
+  country = col_character(), 
+  age = col_double(), 
+  gender = col_factor(), 
+  gender = col_factor(), 
+  trick_or_treating = col_character()
+  ))
+```
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+1.  What is the total number of candy ratings given across the three years. (number of candy ratings, not number of raters. Don’t count missing values)
+```{r}
+q1_number_of_ratings <- candy_clean %>% 
+  select(rating) %>% 
+  filter(!is.na(rating)) %>% 
+  summarise(num_of_candy_ratings = n()) %>% 
+  pull()
 
+paste("The total number of candy ratings given across the three years is",formatC(q1_number_of_ratings,big.mark = ","))
+# first answer is 742,764
+```
+
+
+2.  What was the average age of people who are going out trick or treating?
+```{r}
+q2_trick_or_treating <- candy_clean %>% 
+  select(age, trick_or_treating) %>% 
+  filter(
+    !is.na(trick_or_treating),
+    trick_or_treating == "Yes"
+    ) %>% 
+  summarise(average_age = mean(age, na.ram = TRUE)) %>% 
+  pull()
+
+paste("The average age of people who are going out trick or treating is", round(q2_trick_or_treating, 0), "years old.")
+# first answer is 35 years old
+```
+
+
+3.  What was the average age of people who are not going trick or treating?
+```{r}
+q3_trick_or_treating <- candy_clean %>% 
+  select(age, trick_or_treating) %>% 
+  filter(
+    !is.na(trick_or_treating),
+    trick_or_treating == "No"
+    ) %>% 
+  summarise(average_age = mean(age, na.ram = TRUE)) %>% 
+  pull()
+
+paste("The average age of people who are not going out trick or treating is", round(q3_trick_or_treating, 0), "years old.")
+# first answer is 39 years old
+```
+
+4. How many people rated Starburst as despair?
+```{r}
+q4_starburst_as_despair <- candy_clean %>% 
+  select(candy, rating) %>% 
+  filter(
+    !is.na(rating),
+    candy == "starburst",
+    rating == "DESPAIR"
+    ) %>% 
+  summarise(count = n()) %>% 
+  pull()
+
+paste(formatC(q4_starburst_as_despair,big.mark = ","), "people rated Starburst as despair.")
+# first answer is 1,872 people
+```
+
+For the next three questions, count despair as -1, joy as +1 and meh as 0.
+```{r}
+glimpse(candy_clean)
+q5_ratings_recoded <- candy_clean %>% 
+  mutate(
+    rating = recode_factor(rating, JOY = 1, MEH = 0, DESPAIR = -1),
+    as.numeric(rating)
+  ) %>% 
+   filter(
+    !is.na(rating))
+class(q5_ratings_recoded$rating)
+```
+
+
+5. What was the most popular candy bar by this rating system for each gender in the dataset?
+```{r}
+q5_answer <- q5_ratings_recoded %>% 
+  select(candy, rating, gender) %>% 
+  filter(gender == "Male") %>% 
+  group_by(candy) %>% 
+  summarise(popularity = sum(rating)) %>% 
+  slice_max(n = 1)
+```
+
+
+6. What was the most popular candy bar in each year?
+7. What was the most popular candy bar by this rating for people in US, Canada, UK and all other countries?
