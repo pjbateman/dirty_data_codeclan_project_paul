@@ -215,22 +215,38 @@ pre code {
 
 
 <!-- rnb-text-begin -->
+<p><strong>Introduction to the data set</strong> <br /> The data comprises the results of three annual surveys (2015-2017) compiled by a satirial website called ‘boing boing’. Respondants gave their opinions of various candy bar products, within the context of the Halloween trick-or-treating tradition, as well as some general views on a range of humourous topics. <br /></p>
+<p>A challenge for the data analyst was that much of the data was entered “free text”, so was in a non-standard format. The data was cleaned in the RStudio environment, using a variety of tools and techniques, before conducting the analysis necessary to address the following questions.</p>
+<p><strong>Asumptions made</strong> <br /></p>
+<ul>
+<li>each person has completed the survey once, in a given year</li>
+<li>the candy products in each question actually exist</li>
+<li>there was no bias in those invited to respond, that may bias product popularity</li>
+</ul>
+<p><strong>Steps taken to clean the data</strong> <br /></p>
+<ul>
+<li>for each annual dataset the column names were cleaned, and with reference to the set questions, the key columns (year, country, age, trick or treating) were standardised and sorted to appear in the same order</li>
+<li>there after the questions columns were filtered to include only those with complete rating data, effectively eliminating columns which contained free text responses</li>
+<li>the tablular data was then pivoted longer on candy questions, and each annual dataset was bound together on top of each other</li>
+<li>with a single column for each category (e.g. country), the data was further cleaned where it appeared to be non-sensical (e.g. age of 999 years, or country of ’merica) to prepare for meaningful analysis</li>
+</ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VwcHJlc3NQYWNrYWdlU3RhcnR1cE1lc3NhZ2VzKHtcbiAgIyBsb2FkaW5nIGluIHRoZSBsaWJyYXJpZXNcbiAgbGlicmFyeSh0aWR5dmVyc2UpXG4gIGxpYnJhcnkoaGVyZSlcbn0pXG5cbmBgYCJ9 -->
+<pre class="r"><code>suppressPackageStartupMessages({
+  # loading in the libraries
+  library(tidyverse)
+  library(here)
+})
+</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsb2FkaW5nIGluIHRoZSBkYXRhLCBwcmVzZXJ2aW5nIHRoZSBjb2x1bW4gdHlwZXMgZnJvbWUgdGhlIGNsZWFuaW5nIHNjcmlwdFxuaGVyZTo6aGVyZSgpXG5cbmBgYCJ9 -->
-<pre class="r"><code># loading in the data, preserving the column types frome the cleaning script
-here::here()
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiL1VzZXJzL3VzZXIvRGVza3RvcC9Db2RlQ2xhbi9kaXJ0eV9kYXRhX2NvZGVjbGFuX3Byb2plY3RfcGF1bC90YXNrNFwiXG4ifQ== -->
-<pre><code>[1] &quot;/Users/user/Desktop/CodeClan/dirty_data_codeclan_project_paul/task4&quot;</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2FuZHlfY2xlYW4gPC0gcmVhZF9jc3YoaGVyZShcImNsZWFuX2RhdGEvY2FuZHlfY2xlYW4uY3N2XCIpLCBjb2xfdHlwZXMgPSBsaXN0KFxuICBjYW5keSA9IGNvbF9jaGFyYWN0ZXIoKSwgXG4gIHJhdGluZyA9IGNvbF9mYWN0b3IoKSwgXG4gIHllYXIgPSBjb2xfaW50ZWdlcigpLCBcbiAgY291bnRyeSA9IGNvbF9jaGFyYWN0ZXIoKSwgXG4gIGFnZSA9IGNvbF9kb3VibGUoKSwgXG4gIGdlbmRlciA9IGNvbF9mYWN0b3IoKSwgXG4gIGdlbmRlciA9IGNvbF9mYWN0b3IoKSwgXG4gIHRyaWNrX29yX3RyZWF0aW5nID0gY29sX2NoYXJhY3RlcigpXG4gICkpXG5gYGAifQ== -->
-<pre class="r"><code>candy_clean &lt;- read_csv(here(&quot;clean_data/candy_clean.csv&quot;), col_types = list(
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBsb2FkaW5nIGluIHRoZSBkYXRhLCBwcmVzZXJ2aW5nIHRoZSBjb2x1bW4gdHlwZXMgZnJvbSB0aGUgY2xlYW5pbmcgc2NyaXB0XG5jYW5keV9jbGVhbiA8LSByZWFkX2NzdihoZXJlKFwiY2xlYW5fZGF0YS9jYW5keV9jbGVhbi5jc3ZcIiksIGNvbF90eXBlcyA9IGxpc3QoXG4gIGNhbmR5ID0gY29sX2NoYXJhY3RlcigpLCBcbiAgcmF0aW5nID0gY29sX2ZhY3RvcigpLCBcbiAgeWVhciA9IGNvbF9pbnRlZ2VyKCksIFxuICBjb3VudHJ5ID0gY29sX2NoYXJhY3RlcigpLCBcbiAgYWdlID0gY29sX2RvdWJsZSgpLCBcbiAgZ2VuZGVyID0gY29sX2ZhY3RvcigpLCBcbiAgZ2VuZGVyID0gY29sX2ZhY3RvcigpLCBcbiAgdHJpY2tfb3JfdHJlYXRpbmcgPSBjb2xfY2hhcmFjdGVyKClcbiAgKSlcbmBgYCJ9 -->
+<pre class="r"><code># loading in the data, preserving the column types from the cleaning script
+candy_clean &lt;- read_csv(here(&quot;clean_data/candy_clean.csv&quot;), col_types = list(
   candy = col_character(), 
   rating = col_factor(), 
   year = col_integer(), 
@@ -243,102 +259,179 @@ here::here()
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<ol style="list-style-type: decimal">
-<li>What is the total number of candy ratings given across the three years. (number of candy ratings, not number of raters. Don’t count missing values)</li>
-</ol>
+<div id="questions-section" class="section level4">
+<h4>Questions section</h4>
+<p><strong>1. What is the total number of candy ratings given across the three years. (number of candy ratings, not number of raters. Don’t count missing values)</strong></p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFzdGUoXCJUaGUgdG90YWwgbnVtYmVyIG9mIGNhbmR5IHJhdGluZ3MgZ2l2ZW4gYWNyb3NzIHRoZSB0aHJlZSB5ZWFycyBpc1wiLGZvcm1hdEMocTFfbnVtYmVyX29mX3JhdGluZ3MsYmlnLm1hcmsgPSBcIixcIikpXG5cbmBgYCJ9 -->
-<pre class="r"><code>paste(&quot;The total number of candy ratings given across the three years is&quot;,formatC(q1_number_of_ratings,big.mark = &quot;,&quot;))
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTFfbnVtYmVyX29mX3JhdGluZ3MgPC0gY2FuZHlfY2xlYW4gJT4lIFxuICBzZWxlY3QocmF0aW5nKSAlPiUgXG4gIGZpbHRlcighaXMubmEocmF0aW5nKSkgJT4lIFxuICBzdW1tYXJpc2UobnVtX29mX2NhbmR5X3JhdGluZ3MgPSBuKCkpICU+JSBcbiAgcHVsbCgpXG5cbnBhc3RlKFwiVGhlIHRvdGFsIG51bWJlciBvZiBjYW5keSByYXRpbmdzIGdpdmVuIGFjcm9zcyB0aGUgdGhyZWUgeWVhcnMgaXNcIixmb3JtYXRDKHExX251bWJlcl9vZl9yYXRpbmdzLGJpZy5tYXJrID0gXCIsXCIpKVxuYGBgIn0= -->
+<pre class="r"><code>q1_number_of_ratings &lt;- candy_clean %&gt;% 
+  select(rating) %&gt;% 
+  filter(!is.na(rating)) %&gt;% 
+  summarise(num_of_candy_ratings = n()) %&gt;% 
+  pull()
+
+paste(&quot;The total number of candy ratings given across the three years is&quot;,formatC(q1_number_of_ratings,big.mark = &quot;,&quot;))</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIHRvdGFsIG51bWJlciBvZiBjYW5keSByYXRpbmdzIGdpdmVuIGFjcm9zcyB0aGUgdGhyZWUgeWVhcnMgaXMgNzQyLDc2NFwiXG4ifQ== -->
 <pre><code>[1] &quot;The total number of candy ratings given across the three years is 742,764&quot;</code></pre>
 <!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmaXJzdCBhbnN3ZXIgaXMgNzQyLDc2NFxuYGBgIn0= -->
+<pre class="r"><code># first answer is 742,764</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<ol start="2" style="list-style-type: decimal">
-<li>What was the average age of people who are going out trick or treating?</li>
-</ol>
+<p><strong>2. What was the average age of people who are going out trick or treating?</strong></p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFzdGUoXCJUaGUgYXZlcmFnZSBhZ2Ugb2YgcGVvcGxlIHdobyBhcmUgZ29pbmcgb3V0IHRyaWNrIG9yIHRyZWF0aW5nIGlzXCIsIHJvdW5kKHEyX3RyaWNrX29yX3RyZWF0aW5nLCAwKSwgXCJ5ZWFycyBvbGQuXCIpXG5cbmBgYCJ9 -->
-<pre class="r"><code>paste(&quot;The average age of people who are going out trick or treating is&quot;, round(q2_trick_or_treating, 0), &quot;years old.&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTJfdHJpY2tfb3JfdHJlYXRpbmcgPC0gY2FuZHlfY2xlYW4gJT4lIFxuICBzZWxlY3QoYWdlLCB0cmlja19vcl90cmVhdGluZykgJT4lIFxuICBmaWx0ZXIoXG4gICAgIWlzLm5hKHRyaWNrX29yX3RyZWF0aW5nKSxcbiAgICB0cmlja19vcl90cmVhdGluZyA9PSBcIlllc1wiXG4gICAgKSAlPiUgXG4gIHN1bW1hcmlzZShhdmVyYWdlX2FnZSA9IG1lYW4oYWdlLCBuYS5yYW0gPSBUUlVFKSkgJT4lIFxuICBwdWxsKClcblxucGFzdGUoXCJUaGUgYXZlcmFnZSBhZ2Ugb2YgcGVvcGxlIHdobyBhcmUgZ29pbmcgb3V0IHRyaWNrIG9yIHRyZWF0aW5nIGlzXCIsIHJvdW5kKHEyX3RyaWNrX29yX3RyZWF0aW5nLCAwKSwgXCJ5ZWFycyBvbGQuXCIpXG5gYGAifQ== -->
+<pre class="r"><code>q2_trick_or_treating &lt;- candy_clean %&gt;% 
+  select(age, trick_or_treating) %&gt;% 
+  filter(
+    !is.na(trick_or_treating),
+    trick_or_treating == &quot;Yes&quot;
+    ) %&gt;% 
+  summarise(average_age = mean(age, na.ram = TRUE)) %&gt;% 
+  pull()
+
+paste(&quot;The average age of people who are going out trick or treating is&quot;, round(q2_trick_or_treating, 0), &quot;years old.&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZyBpcyAzNSB5ZWFycyBvbGQuXCJcbiJ9 -->
 <pre><code>[1] &quot;The average age of people who are going out trick or treating is 35 years old.&quot;</code></pre>
 <!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmaXJzdCBhbnN3ZXIgaXMgMzUgeWVhcnMgb2xkXG5gYGAifQ== -->
+<pre class="r"><code># first answer is 35 years old</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<ol start="3" style="list-style-type: decimal">
-<li>What was the average age of people who are not going trick or treating?</li>
-</ol>
+<p><strong>3. What was the average age of people who are <em>not</em> going trick or treating?</strong></p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFzdGUoXCJUaGUgYXZlcmFnZSBhZ2Ugb2YgcGVvcGxlIHdobyBhcmUgbm90IGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZyBpc1wiLCByb3VuZChxM190cmlja19vcl90cmVhdGluZywgMCksIFwieWVhcnMgb2xkLlwiKVxuXG5gYGAifQ== -->
-<pre class="r"><code>paste(&quot;The average age of people who are not going out trick or treating is&quot;, round(q3_trick_or_treating, 0), &quot;years old.&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTNfdHJpY2tfb3JfdHJlYXRpbmcgPC0gY2FuZHlfY2xlYW4gJT4lIFxuICBzZWxlY3QoYWdlLCB0cmlja19vcl90cmVhdGluZykgJT4lIFxuICBmaWx0ZXIoXG4gICAgIWlzLm5hKHRyaWNrX29yX3RyZWF0aW5nKSxcbiAgICB0cmlja19vcl90cmVhdGluZyA9PSBcIk5vXCJcbiAgICApICU+JSBcbiAgc3VtbWFyaXNlKGF2ZXJhZ2VfYWdlID0gbWVhbihhZ2UsIG5hLnJhbSA9IFRSVUUpKSAlPiUgXG4gIHB1bGwoKVxuXG5wYXN0ZShcIlRoZSBhdmVyYWdlIGFnZSBvZiBwZW9wbGUgd2hvIGFyZSBub3QgZ29pbmcgb3V0IHRyaWNrIG9yIHRyZWF0aW5nIGlzXCIsIHJvdW5kKHEzX3RyaWNrX29yX3RyZWF0aW5nLCAwKSwgXCJ5ZWFycyBvbGQuXCIpXG5gYGAifQ== -->
+<pre class="r"><code>q3_trick_or_treating &lt;- candy_clean %&gt;% 
+  select(age, trick_or_treating) %&gt;% 
+  filter(
+    !is.na(trick_or_treating),
+    trick_or_treating == &quot;No&quot;
+    ) %&gt;% 
+  summarise(average_age = mean(age, na.ram = TRUE)) %&gt;% 
+  pull()
+
+paste(&quot;The average age of people who are not going out trick or treating is&quot;, round(q3_trick_or_treating, 0), &quot;years old.&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiVGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIG5vdCBnb2luZyBvdXQgdHJpY2sgb3IgdHJlYXRpbmcgaXMgMzkgeWVhcnMgb2xkLlwiXG4ifQ== -->
 <pre><code>[1] &quot;The average age of people who are not going out trick or treating is 39 years old.&quot;</code></pre>
 <!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmaXJzdCBhbnN3ZXIgaXMgMzkgeWVhcnMgb2xkXG5gYGAifQ== -->
+<pre class="r"><code># first answer is 39 years old</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<ol start="4" style="list-style-type: decimal">
-<li>How many people rated Starburst as despair?</li>
-</ol>
+<p><strong>4. How many people rated Starburst as despair?</strong></p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFzdGUoZm9ybWF0QyhxNF9zdGFyYnVyc3RfYXNfZGVzcGFpcixiaWcubWFyayA9IFwiLFwiKSwgXCJwZW9wbGUgcmF0ZWQgU3RhcmJ1cnN0IGFzIGRlc3BhaXIuXCIpXG5cbmBgYCJ9 -->
-<pre class="r"><code>paste(formatC(q4_starburst_as_despair,big.mark = &quot;,&quot;), &quot;people rated Starburst as despair.&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTRfc3RhcmJ1cnN0X2FzX2Rlc3BhaXIgPC0gY2FuZHlfY2xlYW4gJT4lIFxuICBzZWxlY3QoY2FuZHksIHJhdGluZykgJT4lIFxuICBmaWx0ZXIoXG4gICAgIWlzLm5hKHJhdGluZyksXG4gICAgY2FuZHkgPT0gXCJzdGFyYnVyc3RcIixcbiAgICByYXRpbmcgPT0gXCJERVNQQUlSXCJcbiAgICApICU+JSBcbiAgc3VtbWFyaXNlKGNvdW50ID0gbigpKSAlPiUgXG4gIHB1bGwoKVxuXG5wYXN0ZShmb3JtYXRDKHE0X3N0YXJidXJzdF9hc19kZXNwYWlyLGJpZy5tYXJrID0gXCIsXCIpLCBcInBlb3BsZSByYXRlZCBTdGFyYnVyc3QgYXMgZGVzcGFpci5cIilcbmBgYCJ9 -->
+<pre class="r"><code>q4_starburst_as_despair &lt;- candy_clean %&gt;% 
+  select(candy, rating) %&gt;% 
+  filter(
+    !is.na(rating),
+    candy == &quot;starburst&quot;,
+    rating == &quot;DESPAIR&quot;
+    ) %&gt;% 
+  summarise(count = n()) %&gt;% 
+  pull()
+
+paste(formatC(q4_starburst_as_despair,big.mark = &quot;,&quot;), &quot;people rated Starburst as despair.&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiMSw4NzIgcGVvcGxlIHJhdGVkIFN0YXJidXJzdCBhcyBkZXNwYWlyLlwiXG4ifQ== -->
 <pre><code>[1] &quot;1,872 people rated Starburst as despair.&quot;</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>For the next three questions, count despair as -1, joy as +1 and meh as 0.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2xhc3MocTVfcmF0aW5nc19yZWNvZGVkJHJhdGluZylcblxuYGBgIn0= -->
-<pre class="r"><code>class(q5_ratings_recoded$rating)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBmaXJzdCBhbnN3ZXIgaXMgMSw4NzIgcGVvcGxlXG5gYGAifQ== -->
+<pre class="r"><code># first answer is 1,872 people</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiZmFjdG9yXCJcbiJ9 -->
-<pre><code>[1] &quot;factor&quot;</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<ol start="5" style="list-style-type: decimal">
-<li>What was the most popular candy bar by this rating system for each gender in the dataset?</li>
-</ol>
+<p>For the next three questions, we count despair as -1, joy as +1 and meh as 0.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTVfYW5zd2VyIDwtIHE1X3JhdGluZ3NfcmVjb2RlZCAlPiUgXG4gIGdyb3VwX2J5KGNhbmR5KSAlPiUgXG4gIHN1bW1hcmlzZShwb3B1bGFyaXR5ID0gc3VtKHJhdGluZykpICU+JSBcbiAgc2xpY2VfbWF4KG4gPSAxKVxuXG5gYGAifQ== -->
-<pre class="r"><code>q5_answer &lt;- q5_ratings_recoded %&gt;% 
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTVfcmF0aW5nc19yZWNvZGVkIDwtIGNhbmR5X2NsZWFuICU+JSBcbiAgbXV0YXRlKFxuICAgIHJhdGluZyA9IHJlY29kZV9mYWN0b3IocmF0aW5nLCBKT1kgPSAxLCBNRUggPSAwLCBERVNQQUlSID0gLTEpLFxuICAgIHJhdGluZyA9IGFzLm51bWVyaWMocmF0aW5nKVxuICApICU+JSBcbiAgIGZpbHRlcihcbiAgICAhaXMubmEocmF0aW5nKSlcbmBgYCJ9 -->
+<pre class="r"><code>q5_ratings_recoded &lt;- candy_clean %&gt;% 
+  mutate(
+    rating = recode_factor(rating, JOY = 1, MEH = 0, DESPAIR = -1),
+    rating = as.numeric(rating)
+  ) %&gt;% 
+   filter(
+    !is.na(rating))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>5. What was the most popular candy bar by this rating system for each gender in the dataset?</strong></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjIsIm5jb2wiOjMsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiMiB4IDMiXSwiR3JvdXBzIjpbImdlbmRlciBbMl0iXX19LCJyZGYiOiJINHNJQUFBQUFBQUFBNDFSc1U3RE1CQzlKbkZSZzFwVll1cy9OQkt3TUhaQTNWZ1FsYnBGYm5JdEVhNXQyUTdRalkwdjRQLzRrZ1k3c2FzMkU1WVNQOTg5dmJ0NzkveTR2ay9YS1FERWtBenNuMWdJWlBXeW5EOEFKSkY5RENDQmticy9iZnFtWlVJOHRuZmt2N2hISERKOFI2WXRtbmE2YmZSNnhiWEVvdHBXV0FiaUV2ZVVvWDhsVHc1ZlNwR0NVUjJVVHZwYldoaWhMRHI2VE9Rek00V29NZGU1Uk1wcmsyOXFZMURsUlMzMVB4Z0FFNmUxK1A1eUhzRGk1eGU2NDFxS20xNFhhVWtOemJhSzd2dE5qNVQ0eUxpTk84bldLQ2ZZTk0yeFAxMGduZnMwM0NFdlVaME1vTHc4aEpKU3lKcFJWWmxETi95RjJwV1FwaExjNmtWdVM2VFg3MEQxQXRPYXUvcmx2SGl0K2R2ODlzNVZhUFBkR1hzY25XRy9haExNSUtGcDVMdUtoMDBTUmpmSS9HTmkzV2puektTcXVBbWoyS2pPakRBMDhOSkNzQkRwTm52OEF5cUIzOCtkQWdBQSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["gender"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["candy"],"name":[2],"type":["chr"],"align":["left"]},{"label":["popularity"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"Female","2":"reese_s_peanut_butter_cups","3":"752"},{"1":"Male","2":"reese_s_peanut_butter_cups","3":"1400"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>6. What was the most popular candy bar in each year?</strong></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjMsIm5jb2wiOjMsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiMyB4IDMiXSwiR3JvdXBzIjpbInllYXIgWzNdIl19fSwicmRmIjoiSDRzSUFBQUFBQUFBQTQxUlRVK0VNQkFkV0pBc3lhNG0zdndQY05DTDhiUUhZendiVGZaZ1FycFFsWUJ0MDQ4b04rK2UvUi8rSS9XSHVEaUYxcmljYk5MT3pPdmp2Wmx5ZGI0K1NkY3BBTXdnQ3ZDTU1ZWDQ1dm9pT3dXSVFpd0NpR0J1NHpOZUh3NU1nTVVZa3cvY243aS9zRDRZVlFieWthUlUwVUlWZ2hKbWRMRXhXbE5abEVZb3gwaWFXaGNOMGYvNEFHQnBwVmZ2WjdZNVdMMWVqdkh0RnNhMTAyZGN0a1FwMTQ4SDA0cG9rdDlKOGtnbjlMbmtUemxEWExteHdoYzgrcjcvbnVwNjB0ODVvNDRTK1d0TVdOVjVROEdGYVltc2RZZlZkcUtWY0tGcnpsQXR0QzhhVDdvTjVBVFlOOHk2VjFuNVlGaVRIVnVENFhwY0M1ZlBkbk5yR2ZWT0tuWlNlNVRkMTR6Nm5sdXlvYTBybHZnVXc1QzVrRFh6ZnlaRlZPV2FhK0o1YWNsYmp3eXp3ZllISTdtODUwZ0NBQUE9In0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["year"],"name":[1],"type":["int"],"align":["right"]},{"label":["candy"],"name":[2],"type":["chr"],"align":["left"]},{"label":["popularity"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"2015","2":"reese_s_peanut_butter_cups","3":"4154"},{"1":"2016","2":"kit_kat","3":"873"},{"1":"2017","2":"reese_s_peanut_butter_cups","3":"1367"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[3]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>7. What was the most popular candy bar by this rating for people in US, Canada, UK and all other countries?</strong></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjUsIm5jb2wiOjMsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNSB4IDMiXSwiR3JvdXBzIjpbImNvdW50cnkgWzNdIl19fSwicmRmIjoiSDRzSUFBQUFBQUFBQTUxU3NVN0RNQkIxMjRTcWtWb3FkVU1NL0VDendNQVlDY1RDQmxUcVpybXgyMXAxZlpGekZuVGpTL2hScEFZN2lTc2FNV0VwOGQyNzUzdStPNzg4TG0rVFpVSUlHWkNvNS82eE0wbThlSHVhM3hNUzlaM1RJeEVaK2YzRGhXYzFrNUNwWjdXQml3ZW1HV2V0TjFsb2lZTGZQRXU5NGJEL0J6cHUwVmRrS01xTzJIQW5rZTRZQnE2U21pTkZZOWRySlZvd05xQ2diSjFyQkxVU0JyU2dKZXdGYnAwV0JVTUJ0OEswbkNzalJPbml0QkJNVzZRcml5Z016VzNoNVNjK1phWXkzeG1TWlo5LzcxK2NOT3VzYVhHdVdCbHFDR0RDR2JKMGJkaGVkT2dqQSsrcGRyZy9NblpmMzJldnF1cTdtemVRcHMzb210N2tZRFdhdzBtYmFSNmNwSURDS21Za0hweDM3S1FiUW9FU3RFdlluOVhOUHI5d3ozU0FTNnY5QmZnODMxcTltOTk1Z1RyY3JIRnJ4Ny9zUVNNWlZkM1hJL1JHNnRQb0ZGc0pGWjZINjBaZFoxb1lxY1BJRTRlV0tRS3l3RXR5VUFHcGF5UEhIM0hFamxEWUFnQUEifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["country"],"name":[1],"type":["chr"],"align":["left"]},{"label":["candy"],"name":[2],"type":["chr"],"align":["left"]},{"label":["popularity"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"Canada","2":"kit_kat","3":"226"},{"1":"United Kingdom","2":"lindt_truffle","3":"33"},{"1":"United Kingdom","2":"rolos","3":"33"},{"1":"United Kingdom","2":"tolberone_something_or_other","3":"33"},{"1":"United States","2":"reese_s_peanut_butter_cups","3":"1945"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[5]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>Other interesting analyses or conclusions:</strong> <br></p>
+<ul>
+<li>the data set is very messy, which provides the analyst with some suggestions for survey design!</li>
+<li>it is difficult to know if some of the product names really exist, so domain knowledge would be an advantage in data analysis</li>
+<li>further analysis is required to establish why the same candy products appear in answers 5-7</li>
+</ul>
+<p>Supplementary analysis</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2FuZGllc19saXN0IDwtIHE1X3JhdGluZ3NfcmVjb2RlZCAlPiUgXG4gIHNlbGVjdChjYW5keSkgJT4lIFxuICBncm91cF9ieShjYW5keSkgJT4lIFxuICBmaWx0ZXIoY2FuZHkgJWluJSAtYyhcbiAgICBcImFueV9mdWxsX3NpemVkX2NhbmR5X2JhclwiXG4gICkpXG5cbmBgYCJ9 -->
+<pre class="r"><code>candies_list &lt;- q5_ratings_recoded %&gt;% 
+  select(candy) %&gt;% 
   group_by(candy) %&gt;% 
-  summarise(popularity = sum(rating)) %&gt;% 
-  slice_max(n = 1)
+  filter(candy %in% -c(
+    &quot;any_full_sized_candy_bar&quot;
+  ))
 </code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IFByb2JsZW0gd2l0aCBgc3VtbWFyaXNlKClgIGNvbHVtbiBgcG9wdWxhcml0eWAuXG7ihLkgYHBvcHVsYXJpdHkgPSBzdW0ocmF0aW5nKWAuXG54IOKAmHN1beKAmSBub3QgbWVhbmluZ2Z1bCBmb3IgZmFjdG9yc1xu4oS5IFRoZSBlcnJvciBvY2N1cnJlZCBpbiBncm91cCAxOiBjYW5keSA9IFwiMTAwX2dyYW5kX2JhclwiLlxuUnVuIGBybGFuZzo6bGFzdF9lcnJvcigpYCB0byBzZWUgd2hlcmUgdGhlIGVycm9yIG9jY3VycmVkLlxuIn0= -->
-<pre><code>Error: Problem with `summarise()` column `popularity`.
-ℹ `popularity = sum(rating)`.
-x ‘sum’ not meaningful for factors
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IFByb2JsZW0gd2l0aCBgZmlsdGVyKClgIGlucHV0IGAuLjFgLlxu4oS5IElucHV0IGAuLjFgIGlzIGBjYW5keSAlaW4lIC1jKFwiYW55X2Z1bGxfc2l6ZWRfY2FuZHlfYmFyXCIpYC5cbnggaW52YWxpZCBhcmd1bWVudCB0byB1bmFyeSBvcGVyYXRvclxu4oS5IFRoZSBlcnJvciBvY2N1cnJlZCBpbiBncm91cCAxOiBjYW5keSA9IFwiMTAwX2dyYW5kX2JhclwiLlxuUnVuIGBybGFuZzo6bGFzdF9lcnJvcigpYCB0byBzZWUgd2hlcmUgdGhlIGVycm9yIG9jY3VycmVkLlxuIn0= -->
+<pre><code>Error: Problem with `filter()` input `..1`.
+ℹ Input `..1` is `candy %in% -c(&quot;any_full_sized_candy_bar&quot;)`.
+x invalid argument to unary operator
 ℹ The error occurred in group 1: candy = &quot;100_grand_bar&quot;.
 Run `rlang::last_error()` to see where the error occurred.</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<ol start="6" style="list-style-type: decimal">
-<li>What was the most popular candy bar in each year?</li>
-<li>What was the most popular candy bar by this rating for people in US, Canada, UK and all other countries?</li>
-</ol>
 <!-- rnb-text-end -->
+</div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiSGFsbG93ZWVuIENhbmR5IERhdGEiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCmBgYHtyfQojIGxvYWRpbmcgaW4gdGhlIGxpYnJhcmllcwpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShkcGx5cikKbGlicmFyeShoZXJlKQpsaWJyYXJ5KHN0cmluZ3IpCmBgYAoKCmBgYHtyfQojIGxvYWRpbmcgaW4gdGhlIGRhdGEsIHByZXNlcnZpbmcgdGhlIGNvbHVtbiB0eXBlcyBmcm9tZSB0aGUgY2xlYW5pbmcgc2NyaXB0CmhlcmU6OmhlcmUoKQpjYW5keV9jbGVhbiA8LSByZWFkX2NzdihoZXJlKCJjbGVhbl9kYXRhL2NhbmR5X2NsZWFuLmNzdiIpLCBjb2xfdHlwZXMgPSBsaXN0KAogIGNhbmR5ID0gY29sX2NoYXJhY3RlcigpLCAKICByYXRpbmcgPSBjb2xfZmFjdG9yKCksIAogIHllYXIgPSBjb2xfaW50ZWdlcigpLCAKICBjb3VudHJ5ID0gY29sX2NoYXJhY3RlcigpLCAKICBhZ2UgPSBjb2xfZG91YmxlKCksIAogIGdlbmRlciA9IGNvbF9mYWN0b3IoKSwgCiAgZ2VuZGVyID0gY29sX2ZhY3RvcigpLCAKICB0cmlja19vcl90cmVhdGluZyA9IGNvbF9jaGFyYWN0ZXIoKQogICkpCmBgYAoKMS4gIFdoYXQgaXMgdGhlIHRvdGFsIG51bWJlciBvZiBjYW5keSByYXRpbmdzIGdpdmVuIGFjcm9zcyB0aGUgdGhyZWUgeWVhcnMuIChudW1iZXIgb2YgY2FuZHkgcmF0aW5ncywgbm90IG51bWJlciBvZiByYXRlcnMuIERvbuKAmXQgY291bnQgbWlzc2luZyB2YWx1ZXMpCmBgYHtyfQpxMV9udW1iZXJfb2ZfcmF0aW5ncyA8LSBjYW5keV9jbGVhbiAlPiUgCiAgc2VsZWN0KHJhdGluZykgJT4lIAogIGZpbHRlcighaXMubmEocmF0aW5nKSkgJT4lIAogIHN1bW1hcmlzZShudW1fb2ZfY2FuZHlfcmF0aW5ncyA9IG4oKSkgJT4lIAogIHB1bGwoKQoKcGFzdGUoIlRoZSB0b3RhbCBudW1iZXIgb2YgY2FuZHkgcmF0aW5ncyBnaXZlbiBhY3Jvc3MgdGhlIHRocmVlIHllYXJzIGlzIixmb3JtYXRDKHExX251bWJlcl9vZl9yYXRpbmdzLGJpZy5tYXJrID0gIiwiKSkKIyBmaXJzdCBhbnN3ZXIgaXMgNzQyLDc2NApgYGAKCgoyLiAgV2hhdCB3YXMgdGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZz8KYGBge3J9CnEyX3RyaWNrX29yX3RyZWF0aW5nIDwtIGNhbmR5X2NsZWFuICU+JSAKICBzZWxlY3QoYWdlLCB0cmlja19vcl90cmVhdGluZykgJT4lIAogIGZpbHRlcigKICAgICFpcy5uYSh0cmlja19vcl90cmVhdGluZyksCiAgICB0cmlja19vcl90cmVhdGluZyA9PSAiWWVzIgogICAgKSAlPiUgCiAgc3VtbWFyaXNlKGF2ZXJhZ2VfYWdlID0gbWVhbihhZ2UsIG5hLnJhbSA9IFRSVUUpKSAlPiUgCiAgcHVsbCgpCgpwYXN0ZSgiVGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZyBpcyIsIHJvdW5kKHEyX3RyaWNrX29yX3RyZWF0aW5nLCAwKSwgInllYXJzIG9sZC4iKQojIGZpcnN0IGFuc3dlciBpcyAzNSB5ZWFycyBvbGQKYGBgCgoKMy4gIFdoYXQgd2FzIHRoZSBhdmVyYWdlIGFnZSBvZiBwZW9wbGUgd2hvIGFyZSBub3QgZ29pbmcgdHJpY2sgb3IgdHJlYXRpbmc/CmBgYHtyfQpxM190cmlja19vcl90cmVhdGluZyA8LSBjYW5keV9jbGVhbiAlPiUgCiAgc2VsZWN0KGFnZSwgdHJpY2tfb3JfdHJlYXRpbmcpICU+JSAKICBmaWx0ZXIoCiAgICAhaXMubmEodHJpY2tfb3JfdHJlYXRpbmcpLAogICAgdHJpY2tfb3JfdHJlYXRpbmcgPT0gIk5vIgogICAgKSAlPiUgCiAgc3VtbWFyaXNlKGF2ZXJhZ2VfYWdlID0gbWVhbihhZ2UsIG5hLnJhbSA9IFRSVUUpKSAlPiUgCiAgcHVsbCgpCgpwYXN0ZSgiVGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIG5vdCBnb2luZyBvdXQgdHJpY2sgb3IgdHJlYXRpbmcgaXMiLCByb3VuZChxM190cmlja19vcl90cmVhdGluZywgMCksICJ5ZWFycyBvbGQuIikKIyBmaXJzdCBhbnN3ZXIgaXMgMzkgeWVhcnMgb2xkCmBgYAoKNC4gSG93IG1hbnkgcGVvcGxlIHJhdGVkIFN0YXJidXJzdCBhcyBkZXNwYWlyPwpgYGB7cn0KcTRfc3RhcmJ1cnN0X2FzX2Rlc3BhaXIgPC0gY2FuZHlfY2xlYW4gJT4lIAogIHNlbGVjdChjYW5keSwgcmF0aW5nKSAlPiUgCiAgZmlsdGVyKAogICAgIWlzLm5hKHJhdGluZyksCiAgICBjYW5keSA9PSAic3RhcmJ1cnN0IiwKICAgIHJhdGluZyA9PSAiREVTUEFJUiIKICAgICkgJT4lIAogIHN1bW1hcmlzZShjb3VudCA9IG4oKSkgJT4lIAogIHB1bGwoKQoKcGFzdGUoZm9ybWF0QyhxNF9zdGFyYnVyc3RfYXNfZGVzcGFpcixiaWcubWFyayA9ICIsIiksICJwZW9wbGUgcmF0ZWQgU3RhcmJ1cnN0IGFzIGRlc3BhaXIuIikKIyBmaXJzdCBhbnN3ZXIgaXMgMSw4NzIgcGVvcGxlCmBgYAoKRm9yIHRoZSBuZXh0IHRocmVlIHF1ZXN0aW9ucywgY291bnQgZGVzcGFpciBhcyAtMSwgam95IGFzICsxIGFuZCBtZWggYXMgMC4KYGBge3J9CmdsaW1wc2UoY2FuZHlfY2xlYW4pCnE1X3JhdGluZ3NfcmVjb2RlZCA8LSBjYW5keV9jbGVhbiAlPiUgCiAgbXV0YXRlKAogICAgcmF0aW5nID0gcmVjb2RlX2ZhY3RvcihyYXRpbmcsIEpPWSA9IDEsIE1FSCA9IDAsIERFU1BBSVIgPSAtMSksCiAgICBhcy5udW1lcmljKHJhdGluZykKICApICU+JSAKICAgZmlsdGVyKAogICAgIWlzLm5hKHJhdGluZykpCmNsYXNzKHE1X3JhdGluZ3NfcmVjb2RlZCRyYXRpbmcpCmBgYAoKCjUuIFdoYXQgd2FzIHRoZSBtb3N0IHBvcHVsYXIgY2FuZHkgYmFyIGJ5IHRoaXMgcmF0aW5nIHN5c3RlbSBmb3IgZWFjaCBnZW5kZXIgaW4gdGhlIGRhdGFzZXQ/CmBgYHtyfQpxNV9hbnN3ZXIgPC0gcTVfcmF0aW5nc19yZWNvZGVkICU+JSAKICBzZWxlY3QoY2FuZHksIHJhdGluZywgZ2VuZGVyKSAlPiUgCiAgZmlsdGVyKGdlbmRlciA9PSAiTWFsZSIpICU+JSAKICBncm91cF9ieShjYW5keSkgJT4lIAogIHN1bW1hcmlzZShwb3B1bGFyaXR5ID0gc3VtKHJhdGluZykpICU+JSAKICBzbGljZV9tYXgobiA9IDEpCmBgYAoKCjYuIFdoYXQgd2FzIHRoZSBtb3N0IHBvcHVsYXIgY2FuZHkgYmFyIGluIGVhY2ggeWVhcj8KNy4gV2hhdCB3YXMgdGhlIG1vc3QgcG9wdWxhciBjYW5keSBiYXIgYnkgdGhpcyByYXRpbmcgZm9yIHBlb3BsZSBpbiBVUywgQ2FuYWRhLCBVSyBhbmQgYWxsIG90aGVyIGNvdW50cmllcz8K</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiSGFsbG93ZWVuIENhbmR5IERhdGEiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCgoKKipJbnRyb2R1Y3Rpb24gdG8gdGhlIGRhdGEgc2V0KiogPGJyIC8+ClRoZSBkYXRhIGNvbXByaXNlcyB0aGUgcmVzdWx0cyBvZiB0aHJlZSBhbm51YWwgc3VydmV5cyAoMjAxNS0yMDE3KSBjb21waWxlZCBieSBhIHNhdGlyaWFsIHdlYnNpdGUgY2FsbGVkICdib2luZyBib2luZycuClJlc3BvbmRhbnRzIGdhdmUgdGhlaXIgb3BpbmlvbnMgb2YgdmFyaW91cyBjYW5keSBiYXIgcHJvZHVjdHMsIHdpdGhpbiB0aGUgY29udGV4dCBvZiB0aGUgSGFsbG93ZWVuIHRyaWNrLW9yLXRyZWF0aW5nIHRyYWRpdGlvbiwgYXMgd2VsbCBhcyBzb21lIGdlbmVyYWwgdmlld3Mgb24gYSByYW5nZSBvZiBodW1vdXJvdXMgdG9waWNzLiAgPGJyIC8+CgpBIGNoYWxsZW5nZSBmb3IgdGhlIGRhdGEgYW5hbHlzdCB3YXMgdGhhdCBtdWNoIG9mIHRoZSBkYXRhIHdhcyBlbnRlcmVkICJmcmVlIHRleHQiLCBzbyB3YXMgaW4gYSBub24tc3RhbmRhcmQgZm9ybWF0LiAgVGhlIGRhdGEgd2FzIGNsZWFuZWQgaW4gdGhlIFJTdHVkaW8gZW52aXJvbm1lbnQsIHVzaW5nIGEgdmFyaWV0eSBvZiB0b29scyBhbmQgdGVjaG5pcXVlcywgYmVmb3JlIGNvbmR1Y3RpbmcgdGhlIGFuYWx5c2lzIG5lY2Vzc2FyeSB0byBhZGRyZXNzIHRoZSBmb2xsb3dpbmcgcXVlc3Rpb25zLgoKKipBc3VtcHRpb25zIG1hZGUqKiA8YnIgLz4KCiogZWFjaCBwZXJzb24gaGFzIGNvbXBsZXRlZCB0aGUgc3VydmV5IG9uY2UsIGluIGEgZ2l2ZW4geWVhcgoqIHRoZSBjYW5keSBwcm9kdWN0cyBpbiBlYWNoIHF1ZXN0aW9uIGFjdHVhbGx5IGV4aXN0CiogdGhlcmUgd2FzIG5vIGJpYXMgaW4gdGhvc2UgaW52aXRlZCB0byByZXNwb25kLCB0aGF0IG1heSBiaWFzIHByb2R1Y3QgcG9wdWxhcml0eQoKKipTdGVwcyB0YWtlbiB0byBjbGVhbiB0aGUgZGF0YSoqIDxiciAvPgoKKiBmb3IgZWFjaCBhbm51YWwgZGF0YXNldCB0aGUgY29sdW1uIG5hbWVzIHdlcmUgY2xlYW5lZCwgYW5kIHdpdGggcmVmZXJlbmNlIHRvIHRoZSBzZXQgcXVlc3Rpb25zLCB0aGUga2V5IGNvbHVtbnMgKHllYXIsIGNvdW50cnksIGFnZSwgdHJpY2sgb3IgdHJlYXRpbmcpIHdlcmUgc3RhbmRhcmRpc2VkIGFuZCBzb3J0ZWQgdG8gYXBwZWFyIGluIHRoZSBzYW1lIG9yZGVyCiogdGhlcmUgYWZ0ZXIgdGhlIHF1ZXN0aW9ucyBjb2x1bW5zIHdlcmUgZmlsdGVyZWQgdG8gaW5jbHVkZSBvbmx5IHRob3NlIHdpdGggY29tcGxldGUgcmF0aW5nIGRhdGEsIGVmZmVjdGl2ZWx5IGVsaW1pbmF0aW5nIGNvbHVtbnMgd2hpY2ggY29udGFpbmVkIGZyZWUgdGV4dCByZXNwb25zZXMKKiB0aGUgdGFibHVsYXIgZGF0YSB3YXMgdGhlbiBwaXZvdGVkIGxvbmdlciBvbiBjYW5keSBxdWVzdGlvbnMsIGFuZCBlYWNoIGFubnVhbCBkYXRhc2V0IHdhcyBib3VuZCB0b2dldGhlciBvbiB0b3Agb2YgZWFjaCBvdGhlcgoqIHdpdGggYSBzaW5nbGUgY29sdW1uIGZvciBlYWNoIGNhdGVnb3J5IChlLmcuIGNvdW50cnkpLCB0aGUgZGF0YSB3YXMgZnVydGhlciBjbGVhbmVkIHdoZXJlIGl0IGFwcGVhcmVkIHRvIGJlIG5vbi1zZW5zaWNhbCAoZS5nLiBhZ2Ugb2YgOTk5IHllYXJzLCBvciBjb3VudHJ5IG9mICdtZXJpY2EpIHRvIHByZXBhcmUgZm9yIG1lYW5pbmdmdWwgYW5hbHlzaXMKCmBgYHtyfQpzdXBwcmVzc1BhY2thZ2VTdGFydHVwTWVzc2FnZXMoewogICMgbG9hZGluZyBpbiB0aGUgbGlicmFyaWVzCiAgbGlicmFyeSh0aWR5dmVyc2UpCiAgbGlicmFyeShoZXJlKQp9KQoKYGBgCgoKYGBge3J9CiMgbG9hZGluZyBpbiB0aGUgZGF0YSwgcHJlc2VydmluZyB0aGUgY29sdW1uIHR5cGVzIGZyb20gdGhlIGNsZWFuaW5nIHNjcmlwdApjYW5keV9jbGVhbiA8LSByZWFkX2NzdihoZXJlKCJjbGVhbl9kYXRhL2NhbmR5X2NsZWFuLmNzdiIpLCBjb2xfdHlwZXMgPSBsaXN0KAogIGNhbmR5ID0gY29sX2NoYXJhY3RlcigpLCAKICByYXRpbmcgPSBjb2xfZmFjdG9yKCksIAogIHllYXIgPSBjb2xfaW50ZWdlcigpLCAKICBjb3VudHJ5ID0gY29sX2NoYXJhY3RlcigpLCAKICBhZ2UgPSBjb2xfZG91YmxlKCksIAogIGdlbmRlciA9IGNvbF9mYWN0b3IoKSwgCiAgZ2VuZGVyID0gY29sX2ZhY3RvcigpLCAKICB0cmlja19vcl90cmVhdGluZyA9IGNvbF9jaGFyYWN0ZXIoKQogICkpCmBgYAoKCiMjIyMgUXVlc3Rpb25zIHNlY3Rpb24KKioxLiAgV2hhdCBpcyB0aGUgdG90YWwgbnVtYmVyIG9mIGNhbmR5IHJhdGluZ3MgZ2l2ZW4gYWNyb3NzIHRoZSB0aHJlZSB5ZWFycy4gKG51bWJlciBvZiBjYW5keSByYXRpbmdzLCBub3QgbnVtYmVyIG9mIHJhdGVycy4gRG9u4oCZdCBjb3VudCBtaXNzaW5nIHZhbHVlcykqKgpgYGB7cn0KcTFfbnVtYmVyX29mX3JhdGluZ3MgPC0gY2FuZHlfY2xlYW4gJT4lIAogIHNlbGVjdChyYXRpbmcpICU+JSAKICBmaWx0ZXIoIWlzLm5hKHJhdGluZykpICU+JSAKICBzdW1tYXJpc2UobnVtX29mX2NhbmR5X3JhdGluZ3MgPSBuKCkpICU+JSAKICBwdWxsKCkKCnBhc3RlKCJUaGUgdG90YWwgbnVtYmVyIG9mIGNhbmR5IHJhdGluZ3MgZ2l2ZW4gYWNyb3NzIHRoZSB0aHJlZSB5ZWFycyBpcyIsZm9ybWF0QyhxMV9udW1iZXJfb2ZfcmF0aW5ncyxiaWcubWFyayA9ICIsIikpCiMgZmlyc3QgYW5zd2VyIGlzIDc0Miw3NjQKYGBgCgoKKioyLiAgV2hhdCB3YXMgdGhlIGF2ZXJhZ2UgYWdlIG9mIHBlb3BsZSB3aG8gYXJlIGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZz8qKgpgYGB7cn0KcTJfdHJpY2tfb3JfdHJlYXRpbmcgPC0gY2FuZHlfY2xlYW4gJT4lIAogIHNlbGVjdChhZ2UsIHRyaWNrX29yX3RyZWF0aW5nKSAlPiUgCiAgZmlsdGVyKAogICAgIWlzLm5hKHRyaWNrX29yX3RyZWF0aW5nKSwKICAgIHRyaWNrX29yX3RyZWF0aW5nID09ICJZZXMiCiAgICApICU+JSAKICBzdW1tYXJpc2UoYXZlcmFnZV9hZ2UgPSBtZWFuKGFnZSwgbmEucmFtID0gVFJVRSkpICU+JSAKICBwdWxsKCkKCnBhc3RlKCJUaGUgYXZlcmFnZSBhZ2Ugb2YgcGVvcGxlIHdobyBhcmUgZ29pbmcgb3V0IHRyaWNrIG9yIHRyZWF0aW5nIGlzIiwgcm91bmQocTJfdHJpY2tfb3JfdHJlYXRpbmcsIDApLCAieWVhcnMgb2xkLiIpCiMgZmlyc3QgYW5zd2VyIGlzIDM1IHllYXJzIG9sZApgYGAKCgoqKjMuICBXaGF0IHdhcyB0aGUgYXZlcmFnZSBhZ2Ugb2YgcGVvcGxlIHdobyBhcmUgKm5vdCogZ29pbmcgdHJpY2sgb3IgdHJlYXRpbmc/KioKYGBge3J9CnEzX3RyaWNrX29yX3RyZWF0aW5nIDwtIGNhbmR5X2NsZWFuICU+JSAKICBzZWxlY3QoYWdlLCB0cmlja19vcl90cmVhdGluZykgJT4lIAogIGZpbHRlcigKICAgICFpcy5uYSh0cmlja19vcl90cmVhdGluZyksCiAgICB0cmlja19vcl90cmVhdGluZyA9PSAiTm8iCiAgICApICU+JSAKICBzdW1tYXJpc2UoYXZlcmFnZV9hZ2UgPSBtZWFuKGFnZSwgbmEucmFtID0gVFJVRSkpICU+JSAKICBwdWxsKCkKCnBhc3RlKCJUaGUgYXZlcmFnZSBhZ2Ugb2YgcGVvcGxlIHdobyBhcmUgbm90IGdvaW5nIG91dCB0cmljayBvciB0cmVhdGluZyBpcyIsIHJvdW5kKHEzX3RyaWNrX29yX3RyZWF0aW5nLCAwKSwgInllYXJzIG9sZC4iKQojIGZpcnN0IGFuc3dlciBpcyAzOSB5ZWFycyBvbGQKYGBgCgoqKjQuIEhvdyBtYW55IHBlb3BsZSByYXRlZCBTdGFyYnVyc3QgYXMgZGVzcGFpcj8qKgpgYGB7cn0KcTRfc3RhcmJ1cnN0X2FzX2Rlc3BhaXIgPC0gY2FuZHlfY2xlYW4gJT4lIAogIHNlbGVjdChjYW5keSwgcmF0aW5nKSAlPiUgCiAgZmlsdGVyKAogICAgIWlzLm5hKHJhdGluZyksCiAgICBjYW5keSA9PSAic3RhcmJ1cnN0IiwKICAgIHJhdGluZyA9PSAiREVTUEFJUiIKICAgICkgJT4lIAogIHN1bW1hcmlzZShjb3VudCA9IG4oKSkgJT4lIAogIHB1bGwoKQoKcGFzdGUoZm9ybWF0QyhxNF9zdGFyYnVyc3RfYXNfZGVzcGFpcixiaWcubWFyayA9ICIsIiksICJwZW9wbGUgcmF0ZWQgU3RhcmJ1cnN0IGFzIGRlc3BhaXIuIikKIyBmaXJzdCBhbnN3ZXIgaXMgMSw4NzIgcGVvcGxlCmBgYAoKRm9yIHRoZSBuZXh0IHRocmVlIHF1ZXN0aW9ucywgd2UgY291bnQgZGVzcGFpciBhcyAtMSwgam95IGFzICsxIGFuZCBtZWggYXMgMC4KYGBge3J9CnE1X3JhdGluZ3NfcmVjb2RlZCA8LSBjYW5keV9jbGVhbiAlPiUgCiAgbXV0YXRlKAogICAgcmF0aW5nID0gY2FzZV93aGVuKAogICAgICByYXRpbmcgPT0gIkpPWSIgfiAxLAogICAgICAgcmF0aW5nID09ICJNRUgiIH4gMCwKICAgICAgIHJhdGluZyA9PSAiREVTUEFJUiIgfiAtMQogICAgKSwKICAgIHJhdGluZyA9IGFzLm51bWVyaWMocmF0aW5nKQogICkgJT4lIAogICBmaWx0ZXIoCiAgICAhaXMubmEocmF0aW5nKSkKYGBgCgoKKio1LiBXaGF0IHdhcyB0aGUgbW9zdCBwb3B1bGFyIGNhbmR5IGJhciBieSB0aGlzIHJhdGluZyBzeXN0ZW0gZm9yIGVhY2ggZ2VuZGVyIGluIHRoZSBkYXRhc2V0PyoqCmBgYHtyfQpxNV9hbnN3ZXIgPC0gcTVfcmF0aW5nc19yZWNvZGVkICU+JSAKICBzZWxlY3QoY2FuZHksIHJhdGluZywgZ2VuZGVyKSAlPiUgCiAgZmlsdGVyKCFjYW5keSAlaW4lIGMoCiAgICAiYW55X2Z1bGxfc2l6ZWRfY2FuZHlfYmFyIiwKICAgICJjYXNoX29yX290aGVyX2Zvcm1zX29mX2xlZ2FsX3RlbmRlciIKICApKSAlPiUgCiAgZmlsdGVyKGdlbmRlciAlaW4lIGMoIk1hbGUiLCJGZW1hbGUiKSkgJT4lIAogIGdyb3VwX2J5KGdlbmRlciwgY2FuZHkpICU+JSAKICBzdW1tYXJpc2UocG9wdWxhcml0eSA9IHN1bShyYXRpbmcpLCAuZ3JvdXBzID0gImRyb3BfbGFzdCIpICU+JSAKICBzbGljZV9tYXgob3JkZXJfYnkgPSBwb3B1bGFyaXR5LCBuID0gMSkKcTVfYW5zd2VyCiMgZmlyc3QgYW5zd2VyIGlzIHlvcmtfcGVwcGVybWludF9wYXR0aWVzCmBgYAoKCioqNi4gV2hhdCB3YXMgdGhlIG1vc3QgcG9wdWxhciBjYW5keSBiYXIgaW4gZWFjaCB5ZWFyPyoqCmBgYHtyfQpxNl9hbnN3ZXIgPC0gcTVfcmF0aW5nc19yZWNvZGVkICU+JSAKICBzZWxlY3QoY2FuZHksIHJhdGluZywgeWVhcikgJT4lIAogIGZpbHRlcighY2FuZHkgJWluJSBjKAogICAgImFueV9mdWxsX3NpemVkX2NhbmR5X2JhciIsCiAgICAiY2FzaF9vcl9vdGhlcl9mb3Jtc19vZl9sZWdhbF90ZW5kZXIiCiAgKSkgJT4lIAogIGdyb3VwX2J5KHllYXIsIGNhbmR5KSAlPiUgCiAgc3VtbWFyaXNlKHBvcHVsYXJpdHkgPSBzdW0ocmF0aW5nKSkgJT4lIAogIHNsaWNlX21heChvcmRlcl9ieSA9IHBvcHVsYXJpdHksIG4gPSAxKQpxNl9hbnN3ZXIKIyBmaXJzdCBhbnN3ZXIgaXMgeW9ya19wZXBwZXJtaW50X3BhdHRpZXMKYGBgCgoqKjcuIFdoYXQgd2FzIHRoZSBtb3N0IHBvcHVsYXIgY2FuZHkgYmFyIGJ5IHRoaXMgcmF0aW5nIGZvciBwZW9wbGUgaW4gVVMsIENhbmFkYSwgVUsgYW5kIGFsbCBvdGhlciBjb3VudHJpZXM/KioKYGBge3J9CnE3X2Fuc3dlciA8LSBxNV9yYXRpbmdzX3JlY29kZWQgJT4lIAogIHNlbGVjdChjYW5keSwgcmF0aW5nLCBjb3VudHJ5KSAlPiUgCiAgZmlsdGVyKCFjYW5keSAlaW4lIGMoCiAgICAiYW55X2Z1bGxfc2l6ZWRfY2FuZHlfYmFyIiwKICAgICJjYXNoX29yX290aGVyX2Zvcm1zX29mX2xlZ2FsX3RlbmRlciIKICApKSAlPiUgCiAgZmlsdGVyKGNvdW50cnkgJWluJSBjKCJVbml0ZWQgU3RhdGVzIiwiQ2FuYWRhIiwgIlVuaXRlZCBLaW5nZG9tIikpICU+JSAKICBncm91cF9ieShjb3VudHJ5LCBjYW5keSkgJT4lIAogIHN1bW1hcmlzZShwb3B1bGFyaXR5ID0gc3VtKHJhdGluZyksIC5ncm91cHMgPSAiZHJvcF9sYXN0IikgJT4lIAogIHNsaWNlX21heChvcmRlcl9ieSA9IHBvcHVsYXJpdHksIG4gPSAxKQpxN19hbnN3ZXIKIyBmaXJzdCBhbnN3ZXIgaXMgeW9ya19wZXBwZXJtaW50X3BhdHRpZXMKYGBgCgoqKk90aGVyIGludGVyZXN0aW5nIGFuYWx5c2VzIG9yIGNvbmNsdXNpb25zOioqIDxici8gPgoKKiB0aGUgZGF0YSBzZXQgaXMgdmVyeSBtZXNzeSwgd2hpY2ggcHJvdmlkZXMgdGhlIGFuYWx5c3Qgd2l0aCBzb21lIHN1Z2dlc3Rpb25zIGZvciBzdXJ2ZXkgZGVzaWduIQoqIGl0IGlzIGRpZmZpY3VsdCB0byBrbm93IGlmIHNvbWUgb2YgdGhlIHByb2R1Y3QgbmFtZXMgcmVhbGx5IGV4aXN0LCBzbyBkb21haW4ga25vd2xlZGdlIHdvdWxkIGJlIGFuIGFkdmFudGFnZSBpbiBkYXRhIGFuYWx5c2lzCiogZnVydGhlciBhbmFseXNpcyBpcyByZXF1aXJlZCB0byBlc3RhYmxpc2ggd2h5IHRoZSBzYW1lIGNhbmR5IHByb2R1Y3RzIGFwcGVhciBpbiBhbnN3ZXJzIDUtNwoKU3VwcGxlbWVudGFyeSBhbmFseXNpcwpgYGB7cn0KY2FuZGllc19saXN0IDwtIHE1X3JhdGluZ3NfcmVjb2RlZCAlPiUgCiAgc2VsZWN0KGNhbmR5KSAlPiUgCiAgZ3JvdXBfYnkoY2FuZHkpICU+JSAKICBmaWx0ZXIoIWNhbmR5ICVpbiUgYygKICAgICJhbnlfZnVsbF9zaXplZF9jYW5keV9iYXIiCiAgKSkgJT4lIAogIHN1bW1hcmlzZShjb3VudCA9IG4oKSkgJT4lIAogIGFycmFuZ2UoZGVzYyhjb3VudCkpCmBgYAoK</div>
 
 
 

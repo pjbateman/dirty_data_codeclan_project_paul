@@ -3,7 +3,7 @@
 library(tidyverse) # loads the tibble package to convert rownmes_to_col
 library(janitor) # to use the clean names function
 library(readxl) # to fetch the raw data files
-library(stringr) # to standardise some of the string data, e.g. country column
+library(here) # to make the path for writing reproducible
 
 # fetching the raw data files
 candy_2015_raw <- read_excel("raw_data/boing-boing-candy-2015.xlsx")
@@ -166,7 +166,7 @@ candy_countries <- candy_data_types %>%
   arrange(country) %>% 
   mutate(country = str_to_title(country))
         
-countries <- distinct(candy_countries, country)
+#countries <- distinct(candy_countries, country)
 
 
 # clean up the gender column data
@@ -187,9 +187,9 @@ candy_age <- candy_gender %>%
     age = str_extract(string = age, pattern = "[0-9\\.,]+")
   ) %>% 
   mutate(age = as.numeric(age)) %>% 
-  filter(between(age,5,100)) %>% 
+  filter(between(age,5,100)) %>% # acknowledge around 5% of data is lost as data seems non sensical
   arrange(age)
-ages <- distinct(candy_age, age)
+# ages <- distinct(candy_age, age)
 
 ages_before <- distinct(candy_gender,age) %>% 
   arrange(age)# 276 observations
@@ -197,6 +197,6 @@ ages_before <- distinct(candy_gender,age) %>%
 # clean up the candy names if enough time
 
 # write the cleaned data to a new file
-write_csv(candy_age, "clean_data/candy_clean.csv")
+write_csv(candy_age, here("clean_data/candy_clean.csv"))
 
 # move to answering questions in an .Rmd file

@@ -3,18 +3,39 @@ title: "Halloween Candy Data"
 output: html_notebook
 ---
 
+
+
+**Introduction to the data set** <br />
+The data comprises the results of three annual surveys (2015-2017) compiled by a satirial website called 'boing boing'.
+Respondants gave their opinions of various candy bar products, within the context of the Halloween trick-or-treating tradition, as well as some general views on a range of humourous topics.  <br />
+
+A challenge for the data analyst was that much of the data was entered "free text", so was in a non-standard format.  The data was cleaned in the RStudio environment, using a variety of tools and techniques, before conducting the analysis necessary to address the following questions.
+
+**Asumptions made** <br />
+
+* each person has completed the survey once, in a given year
+* the candy products in each question actually exist
+* there was no bias in those invited to respond, that may bias product popularity
+
+**Steps taken to clean the data** <br />
+
+* for each annual dataset the column names were cleaned, and with reference to the set questions, the key columns (year, country, age, trick or treating) were standardised and sorted to appear in the same order
+* there after the questions columns were filtered to include only those with complete rating data, effectively eliminating columns which contained free text responses
+* the tablular data was then pivoted longer on candy questions, and each annual dataset was bound together on top of each other
+* with a single column for each category (e.g. country), the data was further cleaned where it appeared to be non-sensical (e.g. age of 999 years, or country of 'merica) to prepare for meaningful analysis
+
 ```{r}
-# loading in the libraries
-library(tidyverse)
-library(dplyr)
-library(here)
-library(stringr)
+suppressPackageStartupMessages({
+  # loading in the libraries
+  library(tidyverse)
+  library(here)
+})
+
 ```
 
 
 ```{r}
-# loading in the data, preserving the column types frome the cleaning script
-here::here()
+# loading in the data, preserving the column types from the cleaning script
 candy_clean <- read_csv(here("clean_data/candy_clean.csv"), col_types = list(
   candy = col_character(), 
   rating = col_factor(), 
@@ -27,7 +48,9 @@ candy_clean <- read_csv(here("clean_data/candy_clean.csv"), col_types = list(
   ))
 ```
 
-1.  What is the total number of candy ratings given across the three years. (number of candy ratings, not number of raters. Don’t count missing values)
+
+#### Questions section
+**1.  What is the total number of candy ratings given across the three years. (number of candy ratings, not number of raters. Don’t count missing values)**
 ```{r}
 q1_number_of_ratings <- candy_clean %>% 
   select(rating) %>% 
@@ -40,7 +63,7 @@ paste("The total number of candy ratings given across the three years is",format
 ```
 
 
-2.  What was the average age of people who are going out trick or treating?
+**2.  What was the average age of people who are going out trick or treating?**
 ```{r}
 q2_trick_or_treating <- candy_clean %>% 
   select(age, trick_or_treating) %>% 
@@ -56,7 +79,7 @@ paste("The average age of people who are going out trick or treating is", round(
 ```
 
 
-3.  What was the average age of people who are not going trick or treating?
+**3.  What was the average age of people who are *not* going trick or treating?**
 ```{r}
 q3_trick_or_treating <- candy_clean %>% 
   select(age, trick_or_treating) %>% 
@@ -71,7 +94,7 @@ paste("The average age of people who are not going out trick or treating is", ro
 # first answer is 39 years old
 ```
 
-4. How many people rated Starburst as despair?
+**4. How many people rated Starburst as despair?**
 ```{r}
 q4_starburst_as_despair <- candy_clean %>% 
   select(candy, rating) %>% 
@@ -87,30 +110,85 @@ paste(formatC(q4_starburst_as_despair,big.mark = ","), "people rated Starburst a
 # first answer is 1,872 people
 ```
 
-For the next three questions, count despair as -1, joy as +1 and meh as 0.
+For the next three questions, we count despair as -1, joy as +1 and meh as 0.
 ```{r}
-glimpse(candy_clean)
 q5_ratings_recoded <- candy_clean %>% 
   mutate(
-    rating = recode_factor(rating, JOY = 1, MEH = 0, DESPAIR = -1),
-    as.numeric(rating)
+    rating = case_when(
+      rating == "JOY" ~ 1,
+       rating == "MEH" ~ 0,
+       rating == "DESPAIR" ~ -1
+    ),
+    rating = as.numeric(rating)
   ) %>% 
    filter(
     !is.na(rating))
-class(q5_ratings_recoded$rating)
 ```
 
 
-5. What was the most popular candy bar by this rating system for each gender in the dataset?
+**5. What was the most popular candy bar by this rating system for each gender in the dataset?**
 ```{r}
 q5_answer <- q5_ratings_recoded %>% 
   select(candy, rating, gender) %>% 
-  filter(gender == "Male") %>% 
-  group_by(candy) %>% 
-  summarise(popularity = sum(rating)) %>% 
-  slice_max(n = 1)
+  filter(!candy %in% c(
+    "any_full_sized_candy_bar",
+    "cash_or_other_forms_of_legal_tender"
+  )) %>% 
+  filter(gender %in% c("Male","Female")) %>% 
+  group_by(gender, candy) %>% 
+  summarise(popularity = sum(rating), .groups = "drop_last") %>% 
+  slice_max(order_by = popularity, n = 1)
+q5_answer
+# first answer is york_peppermint_patties
 ```
 
 
-6. What was the most popular candy bar in each year?
-7. What was the most popular candy bar by this rating for people in US, Canada, UK and all other countries?
+**6. What was the most popular candy bar in each year?**
+```{r}
+q6_answer <- q5_ratings_recoded %>% 
+  select(candy, rating, year) %>% 
+  filter(!candy %in% c(
+    "any_full_sized_candy_bar",
+    "cash_or_other_forms_of_legal_tender"
+  )) %>% 
+  group_by(year, candy) %>% 
+  summarise(popularity = sum(rating)) %>% 
+  slice_max(order_by = popularity, n = 1)
+q6_answer
+# first answer is york_peppermint_patties
+```
+
+**7. What was the most popular candy bar by this rating for people in US, Canada, UK and all other countries?**
+```{r}
+q7_answer <- q5_ratings_recoded %>% 
+  select(candy, rating, country) %>% 
+  filter(!candy %in% c(
+    "any_full_sized_candy_bar",
+    "cash_or_other_forms_of_legal_tender"
+  )) %>% 
+  filter(country %in% c("United States","Canada", "United Kingdom")) %>% 
+  group_by(country, candy) %>% 
+  summarise(popularity = sum(rating), .groups = "drop_last") %>% 
+  slice_max(order_by = popularity, n = 1)
+q7_answer
+# first answer is york_peppermint_patties
+```
+
+**Other interesting analyses or conclusions:** <br/ >
+
+* the data set is very messy, which provides the analyst with some suggestions for survey design!
+* it is difficult to know if some of the product names really exist, so domain knowledge would be an advantage in data analysis
+* further analysis is required to establish why the same candy products appear in answers 5-7
+
+Supplementary analysis
+```{r}
+candies_list <- q5_ratings_recoded %>% 
+  select(candy) %>% 
+  group_by(candy) %>% 
+  filter(!candy %in% c(
+    "any_full_sized_candy_bar"
+  )) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+```
+

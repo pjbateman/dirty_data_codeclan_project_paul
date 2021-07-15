@@ -3,11 +3,35 @@ title: "Decathlon Data"
 output: html_notebook
 ---
 
+
+**Introduction to the data** 
+
+
+The data comprises event results for a range of decathlon disciplines across two competitions, Decastar and the Olympic Games.
+
+
+**Assumptions made** <br />
+
+* the source of the data is unkown, and is accepted "as-is" without being assessed for legitimacy
+* if more than one row had the same athlete name, it was assumed to be the same person
+* the data is assumed to be accurately compiled and measured in the appropriate units, consistently
+* the athletes are assumed to be the same sex, for comparability
+* the athletes scores are assumed to be valid, and no later disqualified for any reason
+<br />
+
+**Steps taken to clean the data**
+
+* the first column of raw data was amended from row names to give a single column name of 'athlete'
+* column names were cleaned using the 'janitor' library in R
+* it was noted that the the _rank_ column contained repeated values.  The data was made 'tidy' by pivoting wider on _competition_ using _rank_ as the values.  This effectively put the rank data in two columns, one for each competition.
+
 ```{r}
+suppressPackageStartupMessages({
 # loading in the libraries
-library(tidyverse)
-library(dplyr)
-library(here)
+  library(tidyverse)
+  library(dplyr)
+  library(here)
+})
 ```
 
 
@@ -15,14 +39,15 @@ library(here)
 # loading in the data
 decathlon <- read_csv(here("clean_data/decathlon_clean.csv"))
 ```
-Who had the longest long jump seen in the data?
+
+**Who had the longest long jump seen in the data?**
 ```{r}
 decathlon %>% 
         slice_max(order_by = long_jump, n =1) %>% 
         select(athlete, long_jump)
 ```
 
-What was the average 100m time in each competition?
+**What was the average 100m time in each competition?**
 ```{r}
 avg_dstar_100m <- decathlon %>% 
   filter(!is.na(Decastar)) %>% 
@@ -38,11 +63,11 @@ avg_og_100m <- decathlon %>%
   ) %>% 
   pull()
 
-paste("The average 100m time, in seconds, at the Decastar is",avg_dstar_100m,"and at the Olympic Games is ",avg_og_100m)
+paste("The average 100m time, in seconds, at the Decastar is",avg_dstar_100m,"and at the Olympic Games is",avg_og_100m)
 ```
 
 
-Who had the highest total points across both competitions?
+**Who had the highest total points across both competitions?**
 ```{r}
 decathlon %>% 
   group_by(athlete) %>% 
@@ -52,7 +77,7 @@ decathlon %>%
 ```
 
 
-What was the shot-put scores for the top three competitors in each competition?
+**What was the shot-put scores for the top three competitors in each competition?**
 ```{r}
 top3_shot_dstar <- decathlon %>% 
   filter(!is.na(Decastar)) %>% 
@@ -72,7 +97,7 @@ top3_shot_og
 
 
 
-What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?
+**What was the average points for competitors who ran the 400m in less than 50 seconds vs. those than ran 400m in more than 50 seconds?**
 ```{r}
 fast_400m <- decathlon %>% 
   filter(x400m < 50) %>% 
@@ -92,4 +117,8 @@ paste("The average points for competitors who ran the 400m in less than 50 secon
 
 ```
 
+**Other interesting analyses or conclusions:**
 
+
+* as a next step it would be advisable to determine the source and timestamp of the data
+* it would seem that the 400m result is a good indicator of total points, perhaps negating the need for the other decathlon disciplines!
